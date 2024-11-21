@@ -62,7 +62,7 @@ public class TicketController {
 
     @DeleteMapping("/ticket/my-tickets-list/{id}")
     APIRespond<Void> UserDeleteTicket(@PathVariable Long id){
-        adminServices.DeleteTicket(id);
+        userServices.UserDeleteTicket(id);
         return APIRespond.<Void>builder().build();
     }
 
@@ -82,7 +82,7 @@ public class TicketController {
 
     @DeleteMapping("/ticket/all-user-tickets/{id}")
     APIRespond<Void> AdminDeleteTicket(@PathVariable Long id){
-        adminServices.DeleteTicket(id);
+        adminServices.AdminDeleteTicket(id);
         return APIRespond.<Void>builder().build();
     }
 

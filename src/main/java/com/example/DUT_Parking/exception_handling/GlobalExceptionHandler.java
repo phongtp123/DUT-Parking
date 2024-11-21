@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.example.DUT_Parking.respond.APIRespond;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+@RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 

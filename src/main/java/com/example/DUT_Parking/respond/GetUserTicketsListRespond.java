@@ -1,5 +1,6 @@
 package com.example.DUT_Parking.respond;
 
+import jakarta.persistence.Lob;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -17,4 +18,6 @@ public class GetUserTicketsListRespond {
     Date expiryDate;
     int menhgia;
     String status;
+    @Lob
+    byte[] qr_code;
 }

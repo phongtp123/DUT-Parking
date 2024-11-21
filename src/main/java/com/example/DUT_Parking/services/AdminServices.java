@@ -23,7 +23,7 @@ public interface AdminServices {
     @PreAuthorize("hasRole('ADMIN')")
     void deleteTicket(String ticket_name);
     @PreAuthorize("hasRole('ADMIN')")
-    void DeleteTicket(Long id);
+    void AdminDeleteTicket(Long id);
     @PreAuthorize("hasRole('ADMIN')")
     List<UserTicketsInfo> getAllUserTickets();
 }

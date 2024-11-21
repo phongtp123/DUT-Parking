@@ -63,7 +63,7 @@ public class RechargeImpl implements UserServices {
     }
 
     @Override
-    public void DeleteTicket(Long id) {
+    public void UserDeleteTicket(Long id) {
 
     }
 

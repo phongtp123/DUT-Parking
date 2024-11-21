@@ -25,5 +25,6 @@ public interface UserServices {
     @PreAuthorize("hasRole('USER')")
     EnableTicketRespond enableTicket(Long id) throws ParseException;
     @PreAuthorize("hasRole('USER')")
-    void DeleteTicket(Long id);
+    void UserDeleteTicket(Long id);
+
 }

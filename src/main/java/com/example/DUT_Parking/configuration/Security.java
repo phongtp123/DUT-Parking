@@ -22,7 +22,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class Security {
 
-    private final String[] POST_PUBLIC_URLS = {"/auth/register" , "/auth/login" , "/auth/introspect" , "/auth/logout"};
+    private final String[] POST_PUBLIC_URLS = {"/auth/register" , "/auth/login" , "/auth/introspect" , "/auth/logout"
+    , "/monitor"};
 
     CustomJwtdecoder jwtDecoder;
 

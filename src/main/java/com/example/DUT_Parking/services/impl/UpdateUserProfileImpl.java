@@ -80,6 +80,11 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
         return null;
     }
 
+    @Override
+    public void UserDeleteTicket(Long id) {
+
+    }
+
     public GetProfileRespond SearchUserProfile (String hovaten) {
         UsersProfile searched_profile = usersProfileRepo.findByHovaten(hovaten);
         if (searched_profile == null) {
@@ -112,7 +117,7 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
     }
 
     @Override
-    public void DeleteTicket(Long id) {
+    public void AdminDeleteTicket(Long id) {
 
     }
 

@@ -5,8 +5,6 @@ import com.example.DUT_Parking.entity.Tickets;
 import com.example.DUT_Parking.entity.UserTicketsInfo;
 import com.example.DUT_Parking.entity.UsersProfile;
 import com.example.DUT_Parking.enums.TicketStatus;
-import com.example.DUT_Parking.exception_handling.AppException;
-import com.example.DUT_Parking.exception_handling.ErrorCode;
 import com.example.DUT_Parking.mapper.TicketMapper;
 import com.example.DUT_Parking.repository.TicketsRepo;
 import com.example.DUT_Parking.repository.UserTicketsRepo;
@@ -16,17 +14,19 @@ import com.example.DUT_Parking.services.AdminServices;
 import com.example.DUT_Parking.services.UserServices;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import net.glxn.qrgen.core.image.ImageType;
+import net.glxn.qrgen.javase.QRCode;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -106,6 +106,7 @@ public class TicketImpl implements UserServices, AdminServices {
                     .expiryDate(ticket.getExpiryDate())
                     .menhgia(ticket.getMenhgia())
                     .status(ticket.getStatus())
+                    .qr_code(ticket.getQr_code())
                     .build();
 
             ticketsListRespond.add(respond);
@@ -114,7 +115,13 @@ public class TicketImpl implements UserServices, AdminServices {
         return ticketsListRespond;
     }
 
-    public void DeleteTicket(Long id) {
+    @Transactional
+    public void UserDeleteTicket(Long id) {
+        userTicketsRepo.deleteById(id);
+    }
+
+    @Transactional
+    public void AdminDeleteTicket(Long id) {
         userTicketsRepo.deleteById(id);
     }
 
@@ -133,7 +140,7 @@ public class TicketImpl implements UserServices, AdminServices {
         var expiryDate = ticket_info.getJWTClaimsSet().getExpirationTime();
         requestTicket.setIssueDate(issueDate);
         requestTicket.setExpiryDate(expiryDate);
-
+        requestTicket.setQr_code(qr_code_maker(ticket_token));
         userTicketsRepo.save(requestTicket);
         return EnableTicketRespond.builder()
                 .status(true)
@@ -164,17 +171,19 @@ public class TicketImpl implements UserServices, AdminServices {
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .jwtID(UUID.randomUUID().toString())
                 .issuer("example.com")
-                .subject(ticketName)
+                .claim("id" , id)
+                .claim("ticketName" , ticketName)
                 .issueTime(new Date())
                 .expirationTime(ExpiriDate(id))
                 .claim("Price" , TicketPrice(id))
-                .claim("UserEmail" , email)
-                .claim("Hovaten" , hovaten)
+                .claim("email" , email)
+                .claim("hovaten" , hovaten)
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(header, payload);
         try {
-            jwsObject.sign(new MACSigner(signer_key.getBytes()));
+            String base64EncodedKey = Base64.getEncoder().encodeToString(signer_key.getBytes());
+            jwsObject.sign(new MACSigner(base64EncodedKey));
             return jwsObject.serialize();
         } catch (JOSEException e) {
             log.error("Cannot generate ticket" ,e);
@@ -182,19 +191,6 @@ public class TicketImpl implements UserServices, AdminServices {
         }
     }
 
-//    private SignedJWT verify_ticket(String ticket_token) throws ParseException, JOSEException {
-//        JWSVerifier verifier = new MACVerifier(signer_key.getBytes());
-//        SignedJWT signedJWT = SignedJWT.parse(ticket_token);
-//        Date expirationDate = signedJWT.getJWTClaimsSet().getExpirationTime();
-//        var validation = signedJWT.verify(verifier);
-//        if (!(validation && expirationDate.after(new Date()))){
-//            throw new AppException(ErrorCode.UNAUTHENTICATED);
-//        }
-//        if (logoutUserRepo.existsById(signedJWT.getJWTClaimsSet().getJWTID())) {
-//            throw new AppException(ErrorCode.UNAUTHENTICATED);
-//        }
-//        return signedJWT;
-//    }
 
     private Date ExpiriDate(Long id) {
         Date expDate = new Date();
@@ -222,6 +218,33 @@ public class TicketImpl implements UserServices, AdminServices {
             Price = 39000;
         }
         return Price;
+    }
+
+
+    private byte[] qr_code_maker(String ticket_token) {
+        var data = ticket_token;
+        ByteArrayOutputStream stream = QRCode.from(data).withSize(250 , 250).to(ImageType.PNG)
+                .stream();
+
+        try {
+            // Tạo thư mục nếu chưa tồn tại
+            File folder = new File("E:/Workspace/qr_code_image");
+            if (!folder.exists()) {
+                folder.mkdir();
+            }
+
+            // Tạo file và ghi dữ liệu từ stream
+            File file = new File(folder, String.valueOf(ImageType.PNG)); // Lưu với tên là token
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                fos.write(stream.toByteArray());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
+
+        return stream.toByteArray();
     }
 
     @Override

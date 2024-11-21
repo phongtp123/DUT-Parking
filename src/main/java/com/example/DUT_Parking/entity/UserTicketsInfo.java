@@ -1,15 +1,10 @@
 package com.example.DUT_Parking.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -26,4 +21,6 @@ public class UserTicketsInfo {
     Date expiryDate;
     int menhgia;
     String status;
+    @Lob @Column(name = "qr_code" , columnDefinition = "longblob")
+    byte[] qr_code;
 }
