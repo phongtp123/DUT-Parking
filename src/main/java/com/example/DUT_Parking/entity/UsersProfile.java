@@ -29,8 +29,4 @@ public class UsersProfile {
     long sodu = 0;
     @ElementCollection
     Set<String> roles;
-
-    public boolean isEmpty() {
-        return email == null;
-    }
 }

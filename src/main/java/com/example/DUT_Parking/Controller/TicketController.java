@@ -80,6 +80,13 @@ public class TicketController {
                 .build();
     }
 
+    @GetMapping("/ticket/all-user-tickets/{email}")
+    APIRespond<List<GetUserTicketsListRespond>> findUserTicket(@PathVariable String email){
+        return APIRespond.<List<GetUserTicketsListRespond>>builder()
+                .result(adminServices.findUserTicket(email))
+                .build();
+    }
+
     @DeleteMapping("/ticket/all-user-tickets/{id}")
     APIRespond<Void> AdminDeleteTicket(@PathVariable Long id){
         adminServices.AdminDeleteTicket(id);

@@ -12,6 +12,7 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GetProfileRespond {
+    Long id;
     String email;
     String hovaten;
     String gioitinh;

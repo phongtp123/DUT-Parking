@@ -1,6 +1,7 @@
 package com.example.DUT_Parking.services.impl;
 
 import com.example.DUT_Parking.DTO.*;
+import com.example.DUT_Parking.entity.PassMonitor;
 import com.example.DUT_Parking.entity.UserTicketsInfo;
 import com.example.DUT_Parking.entity.UsersProfile;
 import com.example.DUT_Parking.exception_handling.AppException;
@@ -9,6 +10,7 @@ import com.example.DUT_Parking.repository.UsersProfileRepo;
 import com.example.DUT_Parking.respond.*;
 import com.example.DUT_Parking.services.AdminServices;
 import com.example.DUT_Parking.services.UserServices;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -49,6 +51,7 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
         return GetProfileRespond.builder()
+                .id(usersProfile.getId())
                 .email(usersProfile.getEmail())
                 .hovaten(usersProfile.getHovaten())
                 .sdt(usersProfile.getSdt())
@@ -91,6 +94,7 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
         return GetProfileRespond.builder()
+                .id(searched_profile.getId())
                 .email(searched_profile.getEmail())
                 .hovaten(searched_profile.getHovaten())
                 .sdt(searched_profile.getSdt())
@@ -98,6 +102,8 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
                 .quequan(searched_profile.getQuequan())
                 .dob(searched_profile.getDob())
                 .gioitinh(searched_profile.getGioitinh())
+                .sodu(searched_profile.getSodu())
+                .roles(searched_profile.getRoles())
                 .build();
     }
 
@@ -126,8 +132,24 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
         return List.of();
     }
 
-    public void deleteUserProfile (String hovaten) {
-        usersProfileRepo.deleteByHovaten(hovaten);
+    @Override
+    public List<GetUserTicketsListRespond> findUserTicket(String email) {
+        return List.of();
+    }
+
+    @Override
+    public List<PassMonitor> getAllPassData() {
+        return List.of();
+    }
+
+    @Override
+    public void deleteAllPassData() {
+
+    }
+
+    @Transactional
+    public void deleteUserProfile (Long id) {
+        usersProfileRepo.deleteById(id);
     }
 
     public List<UsersProfile> getAllUsersProfile() {

@@ -106,7 +106,7 @@ public class AuthenticationImpl implements AuthenticationService {
                         .subject(usersProfile.getEmail())
                         .issuer("example.com")
                         .issueTime(new Date())
-                        .expirationTime(new Date(Instant.now().plus(1 , ChronoUnit.HOURS).toEpochMilli()))
+                        .expirationTime(new Date(Instant.now().plus(1 , ChronoUnit.DAYS).toEpochMilli()))
                         .jwtID(UUID.randomUUID().toString())
                         .claim("scope" , buildScope(usersProfile))
                         .build();

@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface UsersProfileRepo extends JpaRepository<UsersProfile, String> {
     UsersProfile findByEmail(String email);
     UsersProfile findByHovaten(String hovaten);
-    void deleteByHovaten(String hovaten);
+    void deleteById(Long id);
 }

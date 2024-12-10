@@ -9,6 +9,4 @@ import java.util.List;
 
 public interface PassMonitorService {
     void HandlePassData (PassRequest request) throws ParseException;
-    @PreAuthorize("hasRole('ADMIN')")
-    List<PassMonitor> getAllPassData();
 }

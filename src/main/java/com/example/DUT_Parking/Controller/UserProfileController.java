@@ -57,9 +57,9 @@ public class UserProfileController {
                 .build();
     }
 
-    @DeleteMapping("/all_profiles/{hovaten}")
-    String DeleteUserProfile(@PathVariable String hovaten) {
-        adminServices.deleteUserProfile(hovaten);
+    @DeleteMapping("/all_profiles/{id}")
+    String DeleteUserProfile(@PathVariable Long id) {
+        adminServices.deleteUserProfile(id);
         return "User profile has been deleted";
     }
 

@@ -1,6 +1,7 @@
 package com.example.DUT_Parking.services.impl;
 
 import com.example.DUT_Parking.DTO.*;
+import com.example.DUT_Parking.entity.PassMonitor;
 import com.example.DUT_Parking.entity.Tickets;
 import com.example.DUT_Parking.entity.UserTicketsInfo;
 import com.example.DUT_Parking.entity.UsersProfile;
@@ -127,6 +128,37 @@ public class TicketImpl implements UserServices, AdminServices {
 
     public List<UserTicketsInfo> getAllUserTickets() {
         return userTicketsRepo.findAll();
+    }
+
+    public List<GetUserTicketsListRespond> findUserTicket (String email) {
+        List<UserTicketsInfo> userTicketsList = userTicketsRepo.findAllByEmail(email);
+
+        List<GetUserTicketsListRespond> ticketsListRespond = new ArrayList<>();
+
+        for (UserTicketsInfo ticket : userTicketsList) {
+            GetUserTicketsListRespond respond = GetUserTicketsListRespond.builder()
+                    .ticketId(ticket.getId())
+                    .ticketName(ticket.getTicketName())
+                    .issueDate(ticket.getIssueDate())
+                    .expiryDate(ticket.getExpiryDate())
+                    .menhgia(ticket.getMenhgia())
+                    .status(ticket.getStatus())
+                    .qr_code(ticket.getQr_code())
+                    .build();
+
+            ticketsListRespond.add(respond);
+        }
+        return ticketsListRespond;
+    }
+
+    @Override
+    public List<PassMonitor> getAllPassData() {
+        return List.of();
+    }
+
+    @Override
+    public void deleteAllPassData() {
+
     }
 
     public EnableTicketRespond enableTicket(Long id) throws ParseException {
@@ -263,7 +295,7 @@ public class TicketImpl implements UserServices, AdminServices {
     }
 
     @Override
-    public void deleteUserProfile(String hovaten) {
+    public void deleteUserProfile(Long id) {
 
     }
 
