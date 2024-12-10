@@ -12,6 +12,7 @@ import com.example.DUT_Parking.services.RegisterService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -33,14 +34,11 @@ public class RegisterImpl implements RegisterService {
 
     public boolean register(RegisterRequest register_info){
         RegisteredUsers registerUser = new RegisteredUsers();
-        if (registeredUserRepo.existsByEmail(register_info.getEmail())) {
-            throw new AppException(ErrorCode.USER_EXISTED);
-        }
-        else {
-            registerUser.setEmail(register_info.getEmail());
-            registerUser.setPassword(register_info.getPassword());
-            var role = new HashSet<String>();
-            role.add(Roles.USER.name());
+        registerUser.setEmail(register_info.getEmail());
+        registerUser.setPassword(register_info.getPassword());
+        var role = new HashSet<String>();
+        role.add(Roles.USER.name());
+        try {
             UsersProfile usersProfile = UsersProfile.builder()
                     .email(register_info.getEmail())
                     .password(register_info.getPassword())
@@ -48,8 +46,10 @@ public class RegisterImpl implements RegisterService {
                     .build();
             registeredUserRepo.save(registerUser);
             usersProfileRepo.save(usersProfile);
-            return true;
+        } catch (DataIntegrityViolationException e) {
+            throw new AppException(ErrorCode.USER_EXISTED);
         }
+        return true;
     }
 
     public RegisteredUsers search(String email) {

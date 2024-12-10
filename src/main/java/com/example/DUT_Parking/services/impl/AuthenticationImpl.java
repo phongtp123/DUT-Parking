@@ -77,6 +77,9 @@ public class AuthenticationImpl implements AuthenticationService {
                                 }
                         }
                         else {
+                                if (loginUserRepo.findByEmail(request.getEmail()) != null){
+                                        loginUserRepo.delete(loginUserRepo.findByEmail(request.getEmail()));
+                                }
                                 throw new AppException(ErrorCode.UNAUTHENTICATED);
                         }
 
