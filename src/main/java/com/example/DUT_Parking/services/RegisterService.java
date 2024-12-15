@@ -15,5 +15,5 @@ public interface RegisterService {
     @PreAuthorize("hasRole('ADMIN')")
     void delete(int id);
     @PreAuthorize("hasRole('ADMIN')")
-    RegisteredUsers search(String email);
+    GetRegisteredUsers search(String email);
 }

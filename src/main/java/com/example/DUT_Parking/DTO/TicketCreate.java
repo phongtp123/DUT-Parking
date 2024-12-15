@@ -11,7 +11,6 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TicketCreate {
-    String ticketId;
     String ticketName;
     int menhgia;
 }

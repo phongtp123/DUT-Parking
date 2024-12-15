@@ -33,10 +33,9 @@ public class RegisterController {
     }
 
     @GetMapping("/registered_users/{email}")
-    APIRespond <RegisteredUsers> search(@PathVariable("email") String email) {
-        RegisteredUsers result = registerService.search(email);
-        return APIRespond.<RegisteredUsers>builder()
-                .message("Users found: ")
+    APIRespond <GetRegisteredUsers> search(@PathVariable("email") String email) {
+        GetRegisteredUsers result = registerService.search(email);
+        return APIRespond.<GetRegisteredUsers>builder()
                 .result(result)
                 .build();
     }

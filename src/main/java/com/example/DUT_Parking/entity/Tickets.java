@@ -16,8 +16,8 @@ import java.util.Set;
 @Builder
 @Entity
 public class Tickets {
-    @Id
-    String ticketId;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
     String ticketName;
     int menhgia;
     @OneToMany(mappedBy = "tickets" , cascade = CascadeType.ALL)

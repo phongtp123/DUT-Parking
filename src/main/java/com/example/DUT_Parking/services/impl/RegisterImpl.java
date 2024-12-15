@@ -58,18 +58,22 @@ public class RegisterImpl implements RegisterService {
             registeredUserRepo.save(registerUser);
             usersProfileRepo.save(usersProfile);
         } catch (DataIntegrityViolationException e) {
-            throw new AppException(ErrorCode.USER_EXISTED);
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
         return true;
     }
 
-    public RegisteredUsers search(String email) {
+    public GetRegisteredUsers search(String email) {
         RegisteredUsers found_user = registeredUserRepo.findByEmail(email);
         if (found_user == null) {
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
         else {
-            return found_user;
+            return GetRegisteredUsers.builder()
+                    .id(found_user.getId())
+                    .email(found_user.getEmail())
+                    .password(found_user.getPassword())
+                    .build();
         }
     }
 

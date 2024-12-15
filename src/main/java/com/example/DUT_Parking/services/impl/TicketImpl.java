@@ -47,7 +47,6 @@ public class TicketImpl implements UserServices, AdminServices {
 
     public TicketRespond createTicket(TicketCreate request) {
         Tickets tickets = Tickets.builder()
-                .ticketId(request.getTicketId())
                 .ticketName(request.getTicketName())
                 .menhgia(request.getMenhgia())
                 .build();
@@ -204,7 +203,6 @@ public class TicketImpl implements UserServices, AdminServices {
 
         return tickets.stream().map(ticket -> {
             GetTicketTypeList getTicketTypeList = new GetTicketTypeList();
-            getTicketTypeList.setTicketId(ticket.getTicketId());
             getTicketTypeList.setTicketName(ticket.getTicketName());
             getTicketTypeList.setMenhgia(ticket.getMenhgia());
             return getTicketTypeList;

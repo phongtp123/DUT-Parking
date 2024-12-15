@@ -18,7 +18,8 @@ import java.util.Set;
 @Builder
 @Entity
 public class UsersProfile {
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
     String MSSV;
     String email;
     String password;
