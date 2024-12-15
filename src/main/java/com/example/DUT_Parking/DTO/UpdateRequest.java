@@ -14,6 +14,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateRequest {
+    String MSSV;
     @NotBlank(message = "INVALID_NAME")
     String hovaten;
     @NotBlank(message = "INVALID_SDT")

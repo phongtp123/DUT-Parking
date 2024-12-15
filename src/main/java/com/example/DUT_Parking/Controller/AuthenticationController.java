@@ -4,6 +4,7 @@ import com.example.DUT_Parking.DTO.AuthenticationRequest;
 import com.example.DUT_Parking.DTO.IntrospectLoginToken;
 import com.example.DUT_Parking.DTO.LogoutRequest;
 import com.example.DUT_Parking.entity.LoginUsers;
+import com.example.DUT_Parking.entity.LogoutUsers;
 import com.example.DUT_Parking.respond.APIRespond;
 import com.example.DUT_Parking.respond.AuthenticationRespond;
 import com.example.DUT_Parking.respond.IntrospectRespond;
@@ -52,5 +53,10 @@ public class AuthenticationController {
         return APIRespond.<Void>builder()
                 .build();
     }
+
+    @GetMapping ("/logout-users")
+    List<LogoutUsers> getAllLogoutUsers() {
+        return authenticationService.getAllLogoutUsers();
+    };
 }
 

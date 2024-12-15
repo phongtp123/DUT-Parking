@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -15,12 +17,19 @@ import java.util.Date;
 public class UserTicketsInfo {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    String email;
-    String ticketName;
+
+    @ManyToOne
+    UsersProfile usersProfile;
+
+    @ManyToOne
+    Tickets tickets;
+
     Date issueDate;
     Date expiryDate;
-    int menhgia;
     String status;
     @Lob @Column(name = "qr_code" , columnDefinition = "longblob")
     byte[] qr_code;
+
+    @OneToMany(mappedBy = "userTicketsInfo" , cascade = CascadeType.ALL)
+    List<PassMonitor> passMonitors = new ArrayList<>();
 }

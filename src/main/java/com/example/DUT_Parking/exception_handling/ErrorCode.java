@@ -21,7 +21,7 @@ public enum ErrorCode {
     INVALID_DIACHI(1011, "Địa chỉ không được bỏ trống", HttpStatus.BAD_REQUEST),
     INVALID_QUEQUAN(1012, "Quê quán không được bỏ trống", HttpStatus.BAD_REQUEST),
     INVALID_SDT(1013, "Số điện thoại không được bỏ trống", HttpStatus.BAD_REQUEST),
-
+    INSUFFICIENT_FUNDS(1014, "Insufficient funds , your fund are not enough to buy this ticket", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

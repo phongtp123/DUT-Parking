@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PassMonitorRepo extends JpaRepository<PassMonitor, String> {
-    PassMonitor findByEmail(String email);
+
 }

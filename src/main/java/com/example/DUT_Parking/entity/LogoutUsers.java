@@ -1,7 +1,8 @@
 package com.example.DUT_Parking.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -15,7 +16,12 @@ import java.util.Date;
 @Builder
 public class LogoutUsers {
     @Id
-    String id;
-    String subject;
+    Long id;
+    @OneToOne
+    @MapsId
+    @JsonIgnore
+    RegisteredUsers registeredUsers;
+
+    String email;
     Date expiryDate;
 }

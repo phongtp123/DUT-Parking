@@ -1,11 +1,10 @@
 package com.example.DUT_Parking.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.apache.catalina.User;
 
 @Entity
 @Data
@@ -15,9 +14,11 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class LoginUsers {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    String email;
-    String password;
+    @OneToOne
+    @MapsId
+    @JsonIgnore
+    RegisteredUsers registeredUsers;
 
+    String email;
 }

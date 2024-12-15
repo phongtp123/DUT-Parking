@@ -8,6 +8,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TicketRespond {
-    String message;
+public class GetTicketTypeList {
+    String ticketId;
+    String ticketName;
+    int menhgia;
 }

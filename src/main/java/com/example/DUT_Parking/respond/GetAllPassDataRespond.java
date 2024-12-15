@@ -8,6 +8,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TicketRespond {
-    String message;
+public class GetAllPassDataRespond {
+    Long id;
+    String hovaten;
+    String email;
+    String ticketName;
+    String decision;
 }

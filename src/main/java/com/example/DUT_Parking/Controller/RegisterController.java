@@ -3,6 +3,7 @@ package com.example.DUT_Parking.Controller;
 import com.example.DUT_Parking.respond.APIRespond;
 import com.example.DUT_Parking.DTO.RegisterRequest;
 import com.example.DUT_Parking.entity.RegisteredUsers;
+import com.example.DUT_Parking.respond.GetRegisteredUsers;
 import com.example.DUT_Parking.respond.RegisterRespond;
 import com.example.DUT_Parking.services.RegisterService;
 import jakarta.validation.Valid;
@@ -41,7 +42,7 @@ public class RegisterController {
     }
 
     @GetMapping("/registered_users")
-    List<RegisteredUsers> getAllUsers() {
+    List<GetRegisteredUsers> getAllUsers() {
         return registerService.getAllUsers();
     }
 

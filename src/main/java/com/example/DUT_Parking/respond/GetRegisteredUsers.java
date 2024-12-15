@@ -8,6 +8,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TicketRespond {
-    String message;
+public class GetRegisteredUsers {
+    Long id;
+    String email;
+    String password;
 }

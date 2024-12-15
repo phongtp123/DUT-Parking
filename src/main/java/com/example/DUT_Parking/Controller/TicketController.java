@@ -1,7 +1,7 @@
 package com.example.DUT_Parking.Controller;
 
 import com.example.DUT_Parking.DTO.BuyTicketRequest;
-import com.example.DUT_Parking.DTO.TicketRequest;
+import com.example.DUT_Parking.DTO.TicketCreate;
 import com.example.DUT_Parking.entity.UserTicketsInfo;
 import com.example.DUT_Parking.respond.*;
 import com.example.DUT_Parking.services.AdminServices;
@@ -27,15 +27,15 @@ public class TicketController {
     }
 
     @PostMapping("/ticket/create-ticket")
-    APIRespond<TicketRespond> createTicket (@RequestBody TicketRequest request){
+    APIRespond<TicketRespond> createTicket (@RequestBody TicketCreate request){
         return APIRespond.<TicketRespond>builder()
                 .result(adminServices.createTicket(request))
                 .build();
     }
 
     @GetMapping("/ticket/tickets-list")
-    APIRespond<List<TicketRespond>> getAllTickets(){
-        return APIRespond.<List<TicketRespond>>builder()
+    APIRespond<List<GetTicketTypeList>> getAllTickets(){
+        return APIRespond.<List<GetTicketTypeList>>builder()
                 .result(adminServices.getAllTickets())
                 .build();
     }
@@ -74,22 +74,22 @@ public class TicketController {
     }
 
     @GetMapping("/ticket/all-user-tickets")
-    APIRespond<List<UserTicketsInfo>> getAllUserTickets(){
-        return APIRespond.<List<UserTicketsInfo>>builder()
+    APIRespond<List<GetAllUserTicketsListRespond>> getAllUserTickets(){
+        return APIRespond.<List<GetAllUserTicketsListRespond>>builder()
                 .result(adminServices.getAllUserTickets())
                 .build();
     }
 
-    @GetMapping("/ticket/all-user-tickets/{email}")
-    APIRespond<List<GetUserTicketsListRespond>> findUserTicket(@PathVariable String email){
-        return APIRespond.<List<GetUserTicketsListRespond>>builder()
-                .result(adminServices.findUserTicket(email))
+    @GetMapping("/ticket/all-user-tickets/{MSSV}")
+    APIRespond<List<GetAllUserTicketsListRespond>> findUserTicket(@PathVariable String MSSV){
+        return APIRespond.<List<GetAllUserTicketsListRespond>>builder()
+                .result(adminServices.findUserTicket(MSSV))
                 .build();
     }
 
-    @DeleteMapping("/ticket/all-user-tickets/{id}")
-    APIRespond<Void> AdminDeleteTicket(@PathVariable Long id){
-        adminServices.AdminDeleteTicket(id);
+    @DeleteMapping("/ticket/all-user-tickets/{MSSV}")
+    APIRespond<Void> AdminDeleteTicket(@PathVariable String MSSV){
+        adminServices.AdminDeleteTicket(MSSV);
         return APIRespond.<Void>builder().build();
     }
 

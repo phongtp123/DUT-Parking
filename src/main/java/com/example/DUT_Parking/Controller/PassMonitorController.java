@@ -3,6 +3,7 @@ package com.example.DUT_Parking.Controller;
 import com.example.DUT_Parking.DTO.PassRequest;
 import com.example.DUT_Parking.entity.PassMonitor;
 import com.example.DUT_Parking.respond.APIRespond;
+import com.example.DUT_Parking.respond.GetAllPassDataRespond;
 import com.example.DUT_Parking.services.AdminServices;
 import com.example.DUT_Parking.services.PassMonitorService;
 import com.example.DUT_Parking.services.UserServices;
@@ -35,8 +36,8 @@ public class PassMonitorController {
     }
 
     @GetMapping("/pass-monitor")
-    APIRespond<List<PassMonitor>> getAllPassData() throws ParseException {
-        return APIRespond.<List<PassMonitor>>builder()
+    APIRespond<List<GetAllPassDataRespond>> getAllPassData() throws ParseException {
+        return APIRespond.<List<GetAllPassDataRespond>>builder()
                 .result(adminServices.getAllPassData())
                 .build();
     }

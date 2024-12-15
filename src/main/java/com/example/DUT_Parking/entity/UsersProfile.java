@@ -7,6 +7,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -16,8 +18,8 @@ import java.util.Set;
 @Builder
 @Entity
 public class UsersProfile {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    @Id
+    String MSSV;
     String email;
     String password;
     String hovaten;
@@ -29,4 +31,9 @@ public class UsersProfile {
     long sodu = 0;
     @ElementCollection
     Set<String> roles;
+    @OneToMany(mappedBy = "usersProfile" , cascade = CascadeType.ALL)
+    List<UserTicketsInfo> userTicketsInfos = new ArrayList<>();
+    @OneToMany(mappedBy = "usersProfile" , cascade = CascadeType.ALL)
+    List<PassMonitor> passMonitors = new ArrayList<>();
+
 }

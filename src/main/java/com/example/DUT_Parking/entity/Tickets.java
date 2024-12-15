@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -15,6 +17,9 @@ import java.util.Set;
 @Entity
 public class Tickets {
     @Id
-    String name;
+    String ticketId;
+    String ticketName;
     int menhgia;
+    @OneToMany(mappedBy = "tickets" , cascade = CascadeType.ALL)
+    List<UserTicketsInfo> userTicketsInfos = new ArrayList<>();
 }

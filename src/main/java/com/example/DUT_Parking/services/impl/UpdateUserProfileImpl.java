@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service("updateUserProfileImpl")
 @RequiredArgsConstructor
@@ -30,6 +31,10 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
         var info = SecurityContextHolder.getContext();
         String name = info.getAuthentication().getName();
         UsersProfile userProfile = usersProfileRepo.findByEmail(name);
+        userProfile.setMSSV(user_profile.getMSSV());
+        if (userProfile.getMSSV() == null) {
+            userProfile.setMSSV("GUEST");
+        }
         userProfile.setHovaten(user_profile.getHovaten());
         userProfile.setSdt(user_profile.getSdt());
         userProfile.setDiachi(user_profile.getDiachi());
@@ -51,7 +56,7 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
         return GetProfileRespond.builder()
-                .id(usersProfile.getId())
+                .MSSV(usersProfile.getMSSV())
                 .email(usersProfile.getEmail())
                 .hovaten(usersProfile.getHovaten())
                 .sdt(usersProfile.getSdt())
@@ -88,32 +93,34 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
 
     }
 
-    public GetProfileRespond SearchUserProfile (String hovaten) {
-        UsersProfile searched_profile = usersProfileRepo.findByHovaten(hovaten);
+    public List<GetProfileRespond> SearchUserProfile (String MSSV) {
+        List<UsersProfile> searched_profile = usersProfileRepo.findByMSSV(MSSV);
         if (searched_profile == null) {
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
-        return GetProfileRespond.builder()
-                .id(searched_profile.getId())
-                .email(searched_profile.getEmail())
-                .hovaten(searched_profile.getHovaten())
-                .sdt(searched_profile.getSdt())
-                .diachi(searched_profile.getDiachi())
-                .quequan(searched_profile.getQuequan())
-                .dob(searched_profile.getDob())
-                .gioitinh(searched_profile.getGioitinh())
-                .sodu(searched_profile.getSodu())
-                .roles(searched_profile.getRoles())
-                .build();
+        return searched_profile.stream().map(profile -> {
+                    GetProfileRespond getProfileRespond = new GetProfileRespond();
+                    getProfileRespond.setMSSV(profile.getMSSV());
+                    getProfileRespond.setEmail(profile.getEmail());
+                    getProfileRespond.setHovaten(profile.getHovaten());
+                    getProfileRespond.setSdt(profile.getSdt());
+                    getProfileRespond.setDiachi(profile.getDiachi());
+                    getProfileRespond.setQuequan(profile.getQuequan());
+                    getProfileRespond.setSodu(profile.getSodu());
+                    getProfileRespond.setDob(profile.getDob());
+                    getProfileRespond.setGioitinh(profile.getGioitinh());
+                    getProfileRespond.setRoles(profile.getRoles());
+                    return getProfileRespond;
+        }).collect(Collectors.toList());
     }
 
     @Override
-    public TicketRespond createTicket(TicketRequest ticketRequest) {
+    public TicketRespond createTicket(TicketCreate ticketCreate) {
         return null;
     }
 
     @Override
-    public List<TicketRespond> getAllTickets() {
+    public List<GetTicketTypeList> getAllTickets() {
         return List.of();
     }
 
@@ -123,22 +130,22 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
     }
 
     @Override
-    public void AdminDeleteTicket(Long id) {
+    public void AdminDeleteTicket(String MSSV) {
 
     }
 
     @Override
-    public List<UserTicketsInfo> getAllUserTickets() {
+    public List<GetAllUserTicketsListRespond> getAllUserTickets() {
         return List.of();
     }
 
     @Override
-    public List<GetUserTicketsListRespond> findUserTicket(String email) {
+    public List<GetAllUserTicketsListRespond> findUserTicket(String email) {
         return List.of();
     }
 
     @Override
-    public List<PassMonitor> getAllPassData() {
+    public List<GetAllPassDataRespond> getAllPassData() {
         return List.of();
     }
 
@@ -148,12 +155,26 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
     }
 
     @Transactional
-    public void deleteUserProfile (Long id) {
-        usersProfileRepo.deleteById(id);
+    public void deleteUserProfile (String MSSV) {
+        usersProfileRepo.deleteById(MSSV);
     }
 
-    public List<UsersProfile> getAllUsersProfile() {
-        return usersProfileRepo.findAll();
+    public List<GetProfileRespond> getAllUsersProfile() {
+        List<UsersProfile> getAllProfiles = usersProfileRepo.findAll();
+        return getAllProfiles.stream().map(profile -> {
+            GetProfileRespond getProfileRespond = new GetProfileRespond();
+            getProfileRespond.setMSSV(profile.getMSSV());
+            getProfileRespond.setEmail(profile.getEmail());
+            getProfileRespond.setHovaten(profile.getHovaten());
+            getProfileRespond.setSdt(profile.getSdt());
+            getProfileRespond.setDiachi(profile.getDiachi());
+            getProfileRespond.setQuequan(profile.getQuequan());
+            getProfileRespond.setSodu(profile.getSodu());
+            getProfileRespond.setDob(profile.getDob());
+            getProfileRespond.setGioitinh(profile.getGioitinh());
+            getProfileRespond.setRoles(profile.getRoles());
+            return getProfileRespond;
+        }).collect(Collectors.toList());
     }
 
 }

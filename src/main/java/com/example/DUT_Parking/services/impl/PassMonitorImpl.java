@@ -1,16 +1,16 @@
 package com.example.DUT_Parking.services.impl;
 
 import com.example.DUT_Parking.DTO.PassRequest;
-import com.example.DUT_Parking.DTO.TicketRequest;
+import com.example.DUT_Parking.DTO.TicketCreate;
 import com.example.DUT_Parking.entity.PassMonitor;
+import com.example.DUT_Parking.entity.Tickets;
 import com.example.DUT_Parking.entity.UserTicketsInfo;
 import com.example.DUT_Parking.entity.UsersProfile;
 import com.example.DUT_Parking.enums.TicketStatus;
 import com.example.DUT_Parking.repository.PassMonitorRepo;
 import com.example.DUT_Parking.repository.UserTicketsRepo;
-import com.example.DUT_Parking.respond.GetProfileRespond;
-import com.example.DUT_Parking.respond.GetUserTicketsListRespond;
-import com.example.DUT_Parking.respond.TicketRespond;
+import com.example.DUT_Parking.repository.UsersProfileRepo;
+import com.example.DUT_Parking.respond.*;
 import com.example.DUT_Parking.services.AdminServices;
 import com.example.DUT_Parking.services.PassMonitorService;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service("passMonitorImpl")
@@ -32,6 +33,7 @@ import java.util.List;
 public class PassMonitorImpl implements PassMonitorService , AdminServices {
     PassMonitorRepo passMonitorRepo;
     UserTicketsRepo userTicketsRepo;
+    UsersProfileRepo usersProfileRepo;
 
     public void HandlePassData (PassRequest request) throws ParseException {
         SignedJWT passToken = SignedJWT.parse(request.getPassToken());
@@ -41,45 +43,45 @@ public class PassMonitorImpl implements PassMonitorService , AdminServices {
         String email = claims.getStringClaim("email");
         String ticketName = claims.getStringClaim("ticketName");
         String decision = claims.getStringClaim("decision");
-
+        var ticket = userTicketsRepo.findById(id);
+        //var ticketType = ticket.getTickets();
+        var profile = ticket.getUsersProfile();
         PassMonitor passMonitor = PassMonitor.builder()
-                .hovaten(hovaten)
-                .email(email)
-                .ticketName(ticketName)
+                .usersProfile(profile)
+                .userTicketsInfo(ticket)
                 .decision(decision)
                 .build();
         if (decision.equals("NOT PASS")){
-            UserTicketsInfo userTicketsInfo = userTicketsRepo.findById(id);
-            userTicketsInfo.setStatus(TicketStatus.EXPIRED.name());
-            userTicketsRepo.save(userTicketsInfo);
+            ticket.setStatus(TicketStatus.EXPIRED.name());
         }
-        if (passMonitorRepo.findByEmail(email) == null) {
-            passMonitorRepo.save(passMonitor);
-        }
+        profile.getPassMonitors().add(passMonitor);
+        ticket.getPassMonitors().add(passMonitor);
+        userTicketsRepo.save(ticket);
+        usersProfileRepo.save(profile);
     }
 
     @Override
-    public void deleteUserProfile(Long id) {
+    public void deleteUserProfile(String MSSV) {
 
     }
 
     @Override
-    public List<UsersProfile> getAllUsersProfile() {
+    public List<GetProfileRespond> getAllUsersProfile() {
         return List.of();
     }
 
     @Override
-    public GetProfileRespond SearchUserProfile(String hovaten) {
+    public List<GetProfileRespond> SearchUserProfile(String hovaten) {
         return null;
     }
 
     @Override
-    public TicketRespond createTicket(TicketRequest request) {
+    public TicketRespond createTicket(TicketCreate request) {
         return null;
     }
 
     @Override
-    public List<TicketRespond> getAllTickets() {
+    public List<GetTicketTypeList> getAllTickets() {
         return List.of();
     }
 
@@ -89,22 +91,34 @@ public class PassMonitorImpl implements PassMonitorService , AdminServices {
     }
 
     @Override
-    public void AdminDeleteTicket(Long id) {
+    public void AdminDeleteTicket(String MSSV) {
 
     }
 
     @Override
-    public List<UserTicketsInfo> getAllUserTickets() {
+    public List<GetAllUserTicketsListRespond> getAllUserTickets() {
         return List.of();
     }
 
     @Override
-    public List<GetUserTicketsListRespond> findUserTicket(String email) {
+    public List<GetAllUserTicketsListRespond> findUserTicket(String email) {
         return List.of();
     }
 
-    public List<PassMonitor> getAllPassData() {
-        return passMonitorRepo.findAll();
+    public List<GetAllPassDataRespond> getAllPassData() {
+        List<PassMonitor> passMonitors = passMonitorRepo.findAll();
+        return passMonitors.stream().map(passMonitor -> {
+            var ticket = passMonitor.getUserTicketsInfo();
+            var profile = passMonitor.getUsersProfile();
+            var ticketType = ticket.getTickets();
+            GetAllPassDataRespond getAllPassDataRespond = new GetAllPassDataRespond();
+            getAllPassDataRespond.setId(passMonitor.getId());
+            getAllPassDataRespond.setHovaten(profile.getHovaten());
+            getAllPassDataRespond.setEmail(profile.getEmail());
+            getAllPassDataRespond.setTicketName(ticketType.getTicketName());
+            getAllPassDataRespond.setDecision(passMonitor.getDecision());
+            return getAllPassDataRespond;
+        }).collect(Collectors.toList());
     }
 
     @Transactional

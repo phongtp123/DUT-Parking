@@ -8,6 +8,7 @@ import com.example.DUT_Parking.exception_handling.AppException;
 import com.example.DUT_Parking.exception_handling.ErrorCode;
 import com.example.DUT_Parking.repository.RegisteredUserRepo;
 import com.example.DUT_Parking.repository.UsersProfileRepo;
+import com.example.DUT_Parking.respond.GetRegisteredUsers;
 import com.example.DUT_Parking.services.RegisterService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +29,17 @@ public class RegisterImpl implements RegisterService {
     UsersProfileRepo usersProfileRepo;
 
 
-    public  List<RegisteredUsers> getAllUsers() {
-        return registeredUserRepo.findAll();
+    public  List<GetRegisteredUsers> getAllUsers() {
+
+        List<RegisteredUsers> registeredUsers = registeredUserRepo.findAll();
+
+        return registeredUsers.stream().map(registeredUser -> {
+            GetRegisteredUsers getRegisteredUsers = new GetRegisteredUsers();
+            getRegisteredUsers.setId(registeredUser.getId());
+            getRegisteredUsers.setEmail(registeredUser.getEmail());
+            getRegisteredUsers.setPassword(registeredUser.getPassword());
+            return getRegisteredUsers;
+        }).collect(Collectors.toList());
     }
 
 

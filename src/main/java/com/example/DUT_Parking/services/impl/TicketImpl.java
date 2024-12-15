@@ -1,11 +1,10 @@
 package com.example.DUT_Parking.services.impl;
 
 import com.example.DUT_Parking.DTO.*;
-import com.example.DUT_Parking.entity.PassMonitor;
-import com.example.DUT_Parking.entity.Tickets;
-import com.example.DUT_Parking.entity.UserTicketsInfo;
-import com.example.DUT_Parking.entity.UsersProfile;
+import com.example.DUT_Parking.entity.*;
 import com.example.DUT_Parking.enums.TicketStatus;
+import com.example.DUT_Parking.exception_handling.AppException;
+import com.example.DUT_Parking.exception_handling.ErrorCode;
 import com.example.DUT_Parking.mapper.TicketMapper;
 import com.example.DUT_Parking.repository.TicketsRepo;
 import com.example.DUT_Parking.repository.UserTicketsRepo;
@@ -32,6 +31,7 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.example.DUT_Parking.services.impl.AuthenticationImpl.signer_key;
 
@@ -45,24 +45,15 @@ public class TicketImpl implements UserServices, AdminServices {
     TicketMapper ticketMapper;
     UserTicketsRepo userTicketsRepo;
 
-    public TicketRespond createTicket(TicketRequest request) {
-        int ticketPrice = 0;
-        var ticket_info = request.getName();
-        if (ticket_info.equals("VE NGAY")) {
-            ticketPrice = 1500;
-        } else if (ticket_info.equals("VE TUAN")) {
-            ticketPrice = 9000;
-        } else if (ticket_info.equals("VE THANG")) {
-            ticketPrice = 39000;
-        }
+    public TicketRespond createTicket(TicketCreate request) {
         Tickets tickets = Tickets.builder()
-                .name(ticket_info)
-                .menhgia(ticketPrice)
+                .ticketId(request.getTicketId())
+                .ticketName(request.getTicketName())
+                .menhgia(request.getMenhgia())
                 .build();
         ticketsRepo.save(tickets);
         return TicketRespond.builder()
-                .name(request.getName())
-                .menhgia(ticketPrice)
+                .message("Ticket create success!")
                 .build();
     }
 
@@ -70,21 +61,24 @@ public class TicketImpl implements UserServices, AdminServices {
         var info = SecurityContextHolder.getContext();
         var rawinfo = info.getAuthentication().getName();
         UsersProfile userinfo = usersProfileRepo.findByEmail(rawinfo);
-        Tickets ticketType = ticketsRepo.findByName(request.getName());
+        Tickets ticketType = ticketsRepo.findByTicketName(request.getName());
         var menhgia = ticketType.getMenhgia();
-        var ticketName = ticketType.getName();
+        var ticketName = ticketType.getTicketName();
         var status = TicketStatus.DISABLE.name();
         var last_sodu = userinfo.getSodu();
+        if (last_sodu < menhgia){
+            throw new AppException(ErrorCode.INSUFFICIENT_FUNDS);
+        }
         var latest_sodu = last_sodu - menhgia;
         userinfo.setSodu(latest_sodu);
-
-
         UserTicketsInfo ticket = UserTicketsInfo.builder()
-                .email(userinfo.getEmail())
-                .ticketName(ticketName)
-                .menhgia(menhgia)
+                .usersProfile(userinfo)
+                .tickets(ticketType)
                 .status(status)
                 .build();
+        ticketType.getUserTicketsInfos().add(ticket);
+        userinfo.getUserTicketsInfos().add(ticket);
+        ticketsRepo.save(ticketType);
         userTicketsRepo.save(ticket);
         usersProfileRepo.save(userinfo);
         return BuyTicketRespond.builder()
@@ -100,12 +94,13 @@ public class TicketImpl implements UserServices, AdminServices {
         List<GetUserTicketsListRespond> ticketsListRespond = new ArrayList<>();
 
         for (UserTicketsInfo ticket : ticketsList) {
+            var ticketType = ticket.getTickets();
             GetUserTicketsListRespond respond = GetUserTicketsListRespond.builder()
                     .ticketId(ticket.getId())
-                    .ticketName(ticket.getTicketName())
+                    .ticketName(ticketType.getTicketName())
                     .issueDate(ticket.getIssueDate())
                     .expiryDate(ticket.getExpiryDate())
-                    .menhgia(ticket.getMenhgia())
+                    .menhgia(ticketType.getMenhgia())
                     .status(ticket.getStatus())
                     .qr_code(ticket.getQr_code())
                     .build();
@@ -122,28 +117,47 @@ public class TicketImpl implements UserServices, AdminServices {
     }
 
     @Transactional
-    public void AdminDeleteTicket(Long id) {
-        userTicketsRepo.deleteById(id);
+    public void AdminDeleteTicket(String MSSV) {
+        userTicketsRepo.deleteByMSSV(MSSV);
     }
 
-    public List<UserTicketsInfo> getAllUserTickets() {
-        return userTicketsRepo.findAll();
+    public  List<GetAllUserTicketsListRespond> getAllUserTickets() {
+
+        List<UserTicketsInfo> userTicketsInfos = userTicketsRepo.findAll();
+
+        return userTicketsInfos.stream().map(userTicketsInfo -> {
+            var ticketType = userTicketsInfo.getTickets();
+            var profile = userTicketsInfo.getUsersProfile();
+            GetAllUserTicketsListRespond getAllUserTicketsListRespond = new GetAllUserTicketsListRespond();
+            getAllUserTicketsListRespond.setTicketId(userTicketsInfo.getId());
+            getAllUserTicketsListRespond.setEmail(profile.getEmail());
+            getAllUserTicketsListRespond.setMSSV(profile.getMSSV());
+            getAllUserTicketsListRespond.setTicketName(ticketType.getTicketName());
+            getAllUserTicketsListRespond.setIssueDate(userTicketsInfo.getIssueDate());
+            getAllUserTicketsListRespond.setExpiryDate(userTicketsInfo.getExpiryDate());
+            getAllUserTicketsListRespond.setMenhgia(ticketType.getMenhgia());
+            getAllUserTicketsListRespond.setStatus(userTicketsInfo.getStatus());
+            return getAllUserTicketsListRespond;
+        }).collect(Collectors.toList());
     }
 
-    public List<GetUserTicketsListRespond> findUserTicket (String email) {
-        List<UserTicketsInfo> userTicketsList = userTicketsRepo.findAllByEmail(email);
+    public List<GetAllUserTicketsListRespond> findUserTicket (String MSSV) {
+        List<UserTicketsInfo> userTicketsList = userTicketsRepo.findAllByMSSV(MSSV);
 
-        List<GetUserTicketsListRespond> ticketsListRespond = new ArrayList<>();
+        List<GetAllUserTicketsListRespond> ticketsListRespond = new ArrayList<>();
 
         for (UserTicketsInfo ticket : userTicketsList) {
-            GetUserTicketsListRespond respond = GetUserTicketsListRespond.builder()
+            var ticketType = ticket.getTickets();
+            var profile = ticket.getUsersProfile();
+            GetAllUserTicketsListRespond respond = GetAllUserTicketsListRespond.builder()
                     .ticketId(ticket.getId())
-                    .ticketName(ticket.getTicketName())
+                    .email(profile.getEmail())
+                    .MSSV(profile.getMSSV())
+                    .ticketName(ticketType.getTicketName())
                     .issueDate(ticket.getIssueDate())
                     .expiryDate(ticket.getExpiryDate())
-                    .menhgia(ticket.getMenhgia())
+                    .menhgia(ticketType.getMenhgia())
                     .status(ticket.getStatus())
-                    .qr_code(ticket.getQr_code())
                     .build();
 
             ticketsListRespond.add(respond);
@@ -152,7 +166,7 @@ public class TicketImpl implements UserServices, AdminServices {
     }
 
     @Override
-    public List<PassMonitor> getAllPassData() {
+    public List<GetAllPassDataRespond> getAllPassData() {
         return List.of();
     }
 
@@ -185,19 +199,29 @@ public class TicketImpl implements UserServices, AdminServices {
         return SignedJWT.parse(token);
     }
 
-    public List<TicketRespond> getAllTickets() {
-        return ticketsRepo.findAll().stream().map(ticketMapper::toTicketRespond).toList();
+    public List<GetTicketTypeList> getAllTickets() {
+        List<Tickets> tickets = ticketsRepo.findAll();
+
+        return tickets.stream().map(ticket -> {
+            GetTicketTypeList getTicketTypeList = new GetTicketTypeList();
+            getTicketTypeList.setTicketId(ticket.getTicketId());
+            getTicketTypeList.setTicketName(ticket.getTicketName());
+            getTicketTypeList.setMenhgia(ticket.getMenhgia());
+            return getTicketTypeList;
+        }).collect(Collectors.toList());
     }
 
-    public void deleteTicket(String ticket_name) {
-        ticketsRepo.deleteById(ticket_name);
+    public void deleteTicket(String ticketId) {
+        ticketsRepo.deleteById(ticketId);
     }
 
     private String generateTicket(Long id) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
         UserTicketsInfo ticket = userTicketsRepo.findById(id);
-        var ticketName = ticket.getTicketName();
-        var email = ticket.getEmail();
+        var ticketType = ticket.getTickets();
+        var ticketName = ticketType.getTicketName();
+        var profile = ticket.getUsersProfile();
+        var email = profile.getEmail();
         UsersProfile userinfo = usersProfileRepo.findByEmail(email);
         var hovaten = userinfo.getHovaten();
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
@@ -227,7 +251,8 @@ public class TicketImpl implements UserServices, AdminServices {
     private Date ExpiriDate(Long id) {
         Date expDate = new Date();
         UserTicketsInfo ticket = userTicketsRepo.findById(id);
-        var ticket_info = ticket.getTicketName();
+        var ticketType = ticket.getTickets();
+        var ticket_info = ticketType.getTicketName();
         if (ticket_info.equals("VE NGAY")) {
             expDate = new Date(Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli());
         } else if (ticket_info.equals("VE TUAN")) {
@@ -239,17 +264,9 @@ public class TicketImpl implements UserServices, AdminServices {
     }
 
     private int TicketPrice(Long id) {
-        int Price = 0;
         UserTicketsInfo ticket = userTicketsRepo.findById(id);
-        var ticket_info = ticket.getTicketName();
-        if (ticket_info.equals("VE NGAY")) {
-            Price = 1500;
-        } else if (ticket_info.equals("VE TUAN")) {
-            Price = 9000;
-        } else if (ticket_info.equals("VE THANG")) {
-            Price = 39000;
-        }
-        return Price;
+        var ticketType = ticket.getTickets();
+        return ticketType.getMenhgia();
     }
 
 
@@ -295,17 +312,17 @@ public class TicketImpl implements UserServices, AdminServices {
     }
 
     @Override
-    public void deleteUserProfile(Long id) {
+    public void deleteUserProfile(String MSSV) {
 
     }
 
     @Override
-    public List<UsersProfile> getAllUsersProfile() {
+    public List<GetProfileRespond> getAllUsersProfile() {
         return List.of();
     }
 
     @Override
-    public GetProfileRespond SearchUserProfile(String hovaten) {
+    public List<GetProfileRespond> SearchUserProfile(String hovaten) {
         return null;
     }
 }

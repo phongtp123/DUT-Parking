@@ -42,6 +42,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationImpl implements AuthenticationService {
         UsersProfileRepo usersProfileRepo;
+        RegisteredUserRepo registeredUserRepo;
         LoginUserRepo loginUserRepo;
         LogoutUserRepo logoutUserRepo;
 
@@ -49,7 +50,8 @@ public class AuthenticationImpl implements AuthenticationService {
         protected static final String signer_key = "4B8SWV0opYWRgxeKoKost+CvEfqKhCPV0G1SFgU6V1vLOLbBWo5hE1JhpQUV7gWL";
 
         public AuthenticationRespond authenticated(AuthenticationRequest request) {
-                var registeredUser = usersProfileRepo.findByEmail(request.getEmail());
+                var registeredUser = registeredUserRepo.findByEmail(request.getEmail());
+                var user = usersProfileRepo.findByEmail(request.getEmail());
                 if (registeredUser == null) {
                         throw new AppException(ErrorCode.USER_NOT_EXISTED);
                 }
@@ -58,11 +60,11 @@ public class AuthenticationImpl implements AuthenticationService {
                         String registered_password = registeredUser.getPassword();
                         boolean authenticate = password.equals(registered_password);
                         if (authenticate) {
-                                var token = generateToken(registeredUser);
+                                var token = generateToken(user);
                                 LoginUsers loginUser = new LoginUsers();
-                                loginUser.setEmail(request.getEmail());
-                                loginUser.setPassword(password);
-                                if (loginUserRepo.findByEmail(request.getEmail()) != null) {
+                                loginUser.setRegisteredUsers(registeredUser);
+                                loginUser.setEmail(registeredUser.getEmail());
+                                if (loginUserRepo.findByRegisteredUsers(registeredUser) != null) {
                                         return AuthenticationRespond.builder()
                                                 .token(token)
                                                 .authenticated(true)
@@ -77,8 +79,8 @@ public class AuthenticationImpl implements AuthenticationService {
                                 }
                         }
                         else {
-                                if (loginUserRepo.findByEmail(request.getEmail()) != null){
-                                        loginUserRepo.delete(loginUserRepo.findByEmail(request.getEmail()));
+                                if (loginUserRepo.findByRegisteredUsers(registeredUser) != null){
+                                        loginUserRepo.delete(loginUserRepo.findByRegisteredUsers(registeredUser));
                                 }
                                 throw new AppException(ErrorCode.UNAUTHENTICATED);
                         }
@@ -88,15 +90,15 @@ public class AuthenticationImpl implements AuthenticationService {
 
         public void logout(LogoutRequest token) throws ParseException, JOSEException {
                 var logoutToken = verify_token(token.getToken());
-                String jti = logoutToken.getJWTClaimsSet().getJWTID();
                 String object = logoutToken.getJWTClaimsSet().getSubject();
+                var registeredUser = registeredUserRepo.findByEmail(object);
                 Date expiryDate = logoutToken.getJWTClaimsSet().getExpirationTime();
                 LogoutUsers logoutUsers = LogoutUsers.builder()
-                        .id(jti)
-                        .subject(object)
+                        .registeredUsers(registeredUser)
+                        .email(registeredUser.getEmail())
                         .expiryDate(expiryDate)
                         .build();
-                var ghostToken = loginUserRepo.findByEmail(object);
+                var ghostToken = loginUserRepo.findByRegisteredUsers(registeredUser);
                 loginUserRepo.delete(ghostToken);
                 logoutUserRepo.save(logoutUsers);
         }
@@ -156,11 +158,12 @@ public class AuthenticationImpl implements AuthenticationService {
                 JWSVerifier verifier = new MACVerifier(signer_key.getBytes());
                 SignedJWT signedJWT = SignedJWT.parse(token);
                 Date expirationDate = signedJWT.getJWTClaimsSet().getExpirationTime();
+                var registeredUser = registeredUserRepo.findByEmail(signedJWT.getJWTClaimsSet().getSubject());
                 var validation = signedJWT.verify(verifier);
                 if (!(validation && expirationDate.after(new Date()))){
                         throw new AppException(ErrorCode.UNAUTHENTICATED);
                 }
-                if (logoutUserRepo.existsById(signedJWT.getJWTClaimsSet().getJWTID())) {
+                if (logoutUserRepo.existsByRegisteredUsers(registeredUser)) {
                         throw new AppException(ErrorCode.UNAUTHENTICATED);
                 }
                 return signedJWT;
@@ -168,6 +171,10 @@ public class AuthenticationImpl implements AuthenticationService {
 
         public List<LoginUsers> getAllUsers() {
                 return loginUserRepo.findAll();
+        }
+
+        public List<LogoutUsers> getAllLogoutUsers() {
+                return logoutUserRepo.findAll();
         }
 
 }

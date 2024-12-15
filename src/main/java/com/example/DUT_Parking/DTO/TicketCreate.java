@@ -10,6 +10,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TicketRequest {
-    String name;
+public class TicketCreate {
+    String ticketId;
+    String ticketName;
+    int menhgia;
 }

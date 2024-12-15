@@ -45,21 +45,21 @@ public class UserProfileController {
     }
 
     @GetMapping("/all_profiles")
-    List<UsersProfile> getAllUserProfile() {
+    List<GetProfileRespond> getAllUserProfile() {
         return adminServices.getAllUsersProfile();
     }
 
-    @GetMapping("/all_profiles/{hovaten}")
+    @GetMapping("/all_profiles/{MSSV}")
     //Service for ADMIN to get the user profile they want to get by ho_va_ten
-    APIRespond <GetProfileRespond> SearchUserProfile(@PathVariable String hovaten) {
-        return APIRespond.<GetProfileRespond>builder()
-                .result(adminServices.SearchUserProfile(hovaten))
+    APIRespond <List<GetProfileRespond>> SearchUserProfile(@PathVariable String MSSV) {
+        return APIRespond.<List<GetProfileRespond>>builder()
+                .result(adminServices.SearchUserProfile(MSSV))
                 .build();
     }
 
-    @DeleteMapping("/all_profiles/{id}")
-    String DeleteUserProfile(@PathVariable Long id) {
-        adminServices.deleteUserProfile(id);
+    @DeleteMapping("/all_profiles/{MSSV}")
+    String DeleteUserProfile(@PathVariable String MSSV) {
+        adminServices.deleteUserProfile(MSSV);
         return "User profile has been deleted";
     }
 

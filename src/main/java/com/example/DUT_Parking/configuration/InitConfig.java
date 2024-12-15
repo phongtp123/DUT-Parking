@@ -1,5 +1,6 @@
 package com.example.DUT_Parking.configuration;
 
+import com.example.DUT_Parking.entity.RegisteredUsers;
 import com.example.DUT_Parking.entity.UsersProfile;
 import com.example.DUT_Parking.enums.Roles;
 import com.example.DUT_Parking.repository.RegisteredUserRepo;
@@ -14,9 +15,9 @@ import java.util.HashSet;
 public class InitConfig {
 
     @Bean
-    ApplicationRunner applicationRunner(UsersProfileRepo usersProfileRepo) {
+    ApplicationRunner applicationRunner(RegisteredUserRepo registeredUserRepo, UsersProfileRepo usersProfileRepo) {
         return args -> {
-            if ( usersProfileRepo.findByEmail("admin@gmail.com") == null ) {
+            if ( usersProfileRepo.findByEmail("admin@gmail.com") == null && registeredUserRepo.findByEmail("admin@gmail.com") == null ) {
                 var role = new HashSet<String>();
                 role.add(Roles.ADMIN.name());
                 UsersProfile admin = UsersProfile.builder()
@@ -24,8 +25,12 @@ public class InitConfig {
                         .password("admin")
                         .roles(role)
                         .build();
-
                 usersProfileRepo.save(admin);
+                RegisteredUsers admin_reg = RegisteredUsers.builder()
+                        .email("admin@gmail.com")
+                        .password("admin")
+                        .build();
+                registeredUserRepo.save(admin_reg);
             }
         };
     }
