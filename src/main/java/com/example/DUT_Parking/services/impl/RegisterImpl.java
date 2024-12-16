@@ -10,6 +10,7 @@ import com.example.DUT_Parking.repository.RegisteredUserRepo;
 import com.example.DUT_Parking.repository.UsersProfileRepo;
 import com.example.DUT_Parking.respond.GetRegisteredUsers;
 import com.example.DUT_Parking.services.RegisterService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -77,6 +78,7 @@ public class RegisterImpl implements RegisterService {
         }
     }
 
+    @Transactional
     public void delete(int id) {
         registeredUserRepo.deleteById(id);
     }

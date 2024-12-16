@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class RegisterController {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/registered_users/{email}")
     APIRespond <GetRegisteredUsers> search(@PathVariable("email") String email) {
         GetRegisteredUsers result = registerService.search(email);
@@ -40,11 +42,13 @@ public class RegisterController {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/registered_users")
     List<GetRegisteredUsers> getAllUsers() {
         return registerService.getAllUsers();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/registered_users/{id}")
     String deleteUser(@PathVariable("id") int id) {
         registerService.delete(id);
