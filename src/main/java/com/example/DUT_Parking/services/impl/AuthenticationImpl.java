@@ -5,6 +5,7 @@ import com.example.DUT_Parking.DTO.IntrospectLoginToken;
 import com.example.DUT_Parking.DTO.LogoutRequest;
 import com.example.DUT_Parking.entity.LogoutUsers;
 import com.example.DUT_Parking.entity.LoginUsers;
+import com.example.DUT_Parking.entity.RegisteredUsers;
 import com.example.DUT_Parking.entity.UsersProfile;
 import com.example.DUT_Parking.exception_handling.AppException;
 import com.example.DUT_Parking.exception_handling.ErrorCode;
@@ -12,8 +13,7 @@ import com.example.DUT_Parking.repository.LogoutUserRepo;
 import com.example.DUT_Parking.repository.LoginUserRepo;
 import com.example.DUT_Parking.repository.RegisteredUserRepo;
 import com.example.DUT_Parking.repository.UsersProfileRepo;
-import com.example.DUT_Parking.respond.AuthenticationRespond;
-import com.example.DUT_Parking.respond.IntrospectRespond;
+import com.example.DUT_Parking.respond.*;
 import com.example.DUT_Parking.services.AuthenticationService;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -169,12 +170,28 @@ public class AuthenticationImpl implements AuthenticationService {
                 return signedJWT;
         }
 
-        public List<LoginUsers> getAllUsers() {
-                return loginUserRepo.findAll();
+        public  List<GetLoginUsers> getAllUsers() {
+
+                List<LoginUsers> loginUsers = loginUserRepo.findAll();
+
+                return loginUsers.stream().map(loginUser -> {
+                        GetLoginUsers getLoginUsers = new GetLoginUsers();
+                        getLoginUsers.setId(loginUser.getId());
+                        getLoginUsers.setEmail(loginUser.getEmail());
+                        return getLoginUsers;
+                }).collect(Collectors.toList());
         }
 
-        public List<LogoutUsers> getAllLogoutUsers() {
-                return logoutUserRepo.findAll();
+        public List<GetLogoutUsers> getAllLogoutUsers() {
+                List<LogoutUsers> logoutUsers = logoutUserRepo.findAll();
+
+                return logoutUsers.stream().map(logoutUser -> {
+                        GetLogoutUsers getLogoutUsers = new GetLogoutUsers();
+                        getLogoutUsers.setId(logoutUser.getId());
+                        getLogoutUsers.setEmail(logoutUser.getEmail());
+                        getLogoutUsers.setExpiryDate(logoutUser.getExpiryDate());
+                        return getLogoutUsers;
+                }).collect(Collectors.toList());
         }
 
 }

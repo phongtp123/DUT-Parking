@@ -6,6 +6,8 @@ import com.example.DUT_Parking.DTO.LogoutRequest;
 import com.example.DUT_Parking.entity.LoginUsers;
 import com.example.DUT_Parking.entity.LogoutUsers;
 import com.example.DUT_Parking.respond.AuthenticationRespond;
+import com.example.DUT_Parking.respond.GetLoginUsers;
+import com.example.DUT_Parking.respond.GetLogoutUsers;
 import com.example.DUT_Parking.respond.IntrospectRespond;
 import com.nimbusds.jose.JOSEException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,8 +19,8 @@ public interface AuthenticationService {
     AuthenticationRespond authenticated(AuthenticationRequest authenticationRequest);
     IntrospectRespond introspect(IntrospectLoginToken token) throws JOSEException, ParseException;
     @PreAuthorize("hasRole('ADMIN')")
-    List<LoginUsers> getAllUsers();
+    List<GetLoginUsers> getAllUsers();
     void logout(LogoutRequest token) throws ParseException, JOSEException;
     @PreAuthorize("hasRole('ADMIN')")
-    List<LogoutUsers> getAllLogoutUsers();
+    List<GetLogoutUsers> getAllLogoutUsers();
 }

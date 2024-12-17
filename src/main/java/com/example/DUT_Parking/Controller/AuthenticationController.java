@@ -3,17 +3,14 @@ package com.example.DUT_Parking.Controller;
 import com.example.DUT_Parking.DTO.AuthenticationRequest;
 import com.example.DUT_Parking.DTO.IntrospectLoginToken;
 import com.example.DUT_Parking.DTO.LogoutRequest;
-import com.example.DUT_Parking.entity.LoginUsers;
-import com.example.DUT_Parking.entity.LogoutUsers;
-import com.example.DUT_Parking.respond.APIRespond;
-import com.example.DUT_Parking.respond.AuthenticationRespond;
-import com.example.DUT_Parking.respond.IntrospectRespond;
+import com.example.DUT_Parking.respond.*;
 import com.example.DUT_Parking.services.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -27,15 +24,16 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
 
     @PostMapping ("/login")
-    APIRespond <AuthenticationRespond> authenticated(@RequestBody AuthenticationRequest request) {
+    APIRespond <AuthenticationRespond> authenticated(@RequestBody @Valid AuthenticationRequest request) {
         var result = authenticationService.authenticated(request);
         return APIRespond.<AuthenticationRespond>builder()
                 .result(result)
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping ("/login-users")
-    List<LoginUsers> getAllUsers() {
+    List<GetLoginUsers> getAllUsers() {
         return authenticationService.getAllUsers();
     }
 
@@ -54,8 +52,9 @@ public class AuthenticationController {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping ("/logout-users")
-    List<LogoutUsers> getAllLogoutUsers() {
+    List<GetLogoutUsers> getAllLogoutUsers() {
         return authenticationService.getAllLogoutUsers();
     };
 }
