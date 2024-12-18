@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,7 @@ public class RechargeController {
         this.userServices = userServices;
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/recharge")
     APIRespond <RechargeRespond> recharge (@RequestBody RechargeRequest request){
         var result = userServices.recharge(request);

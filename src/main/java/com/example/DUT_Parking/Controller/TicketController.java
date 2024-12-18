@@ -9,6 +9,7 @@ import com.example.DUT_Parking.services.UserServices;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -26,6 +27,7 @@ public class TicketController {
         this.adminServices = adminServices;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/ticket/create-ticket")
     APIRespond<TicketRespond> createTicket (@RequestBody TicketCreate request){
         return APIRespond.<TicketRespond>builder()
@@ -33,19 +35,20 @@ public class TicketController {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/ticket/tickets-list")
-    APIRespond<List<GetTicketTypeList>> getAllTickets(){
-        return APIRespond.<List<GetTicketTypeList>>builder()
-                .result(adminServices.getAllTickets())
-                .build();
+    List<GetTicketTypeList> getAllTickets(){
+        return adminServices.getAllTickets();
     }
 
-    @DeleteMapping("/ticket/{ticket_name}")
-    APIRespond<Void> deleteTicket(@PathVariable String ticket_name){
-        adminServices.deleteTicket(ticket_name);
-        return APIRespond.<Void>builder().build();
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/ticket/tickets-list/{ticketId}")
+    String deleteTicket(@PathVariable String ticketId){
+        adminServices.deleteTicket(ticketId);
+        return String.format("Ticket %s has been delete successfully", ticketId);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/ticket/buy-ticket")
     APIRespond<BuyTicketRespond> buyTicket (@RequestBody BuyTicketRequest request){
         return APIRespond.<BuyTicketRespond>builder()
@@ -53,19 +56,20 @@ public class TicketController {
                 .build();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/ticket/my-tickets-list")
-    APIRespond<List<GetUserTicketsListRespond>> getUserTicketsList(){
-        return APIRespond.<List<GetUserTicketsListRespond>>builder()
-                .result(userServices.getUserTicketsList())
-                .build();
+    List<GetUserTicketsListRespond> getUserTicketsList(){
+        return userServices.getUserTicketsList();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/ticket/my-tickets-list/{id}")
     APIRespond<Void> UserDeleteTicket(@PathVariable Long id){
         userServices.UserDeleteTicket(id);
         return APIRespond.<Void>builder().build();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/ticket/my-tickets-list/enable-ticket/{id}")
     APIRespond<EnableTicketRespond> enableTicket (@PathVariable Long id) throws ParseException {
         return APIRespond.<EnableTicketRespond>builder()
@@ -73,6 +77,7 @@ public class TicketController {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/ticket/all-user-tickets")
     APIRespond<List<GetAllUserTicketsListRespond>> getAllUserTickets(){
         return APIRespond.<List<GetAllUserTicketsListRespond>>builder()
@@ -80,6 +85,7 @@ public class TicketController {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/ticket/all-user-tickets/{MSSV}")
     APIRespond<List<GetAllUserTicketsListRespond>> findUserTicket(@PathVariable String MSSV){
         return APIRespond.<List<GetAllUserTicketsListRespond>>builder()
@@ -87,6 +93,7 @@ public class TicketController {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/ticket/all-user-tickets/{MSSV}")
     APIRespond<Void> AdminDeleteTicket(@PathVariable String MSSV){
         adminServices.AdminDeleteTicket(MSSV);

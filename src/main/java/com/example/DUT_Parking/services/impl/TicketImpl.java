@@ -209,6 +209,7 @@ public class TicketImpl implements UserServices, AdminServices {
         }).collect(Collectors.toList());
     }
 
+    @Transactional
     public void deleteTicket(String ticketId) {
         ticketsRepo.deleteById(ticketId);
     }
