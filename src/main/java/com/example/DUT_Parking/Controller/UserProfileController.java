@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class UserProfileController {
         this.adminServices = adminServices;
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/my_profile")
     //Service for user only to get their profile
     APIRespond <GetProfileRespond> GetUserProfile() {
@@ -37,6 +39,7 @@ public class UserProfileController {
                 .build();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PutMapping("/my_profile/update")
     APIRespond <UpdateRespond> UpdateProfile(@RequestBody @Valid UpdateRequest request) {
         return APIRespond.<UpdateRespond>builder()
@@ -44,19 +47,20 @@ public class UserProfileController {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all_profiles")
     List<GetProfileRespond> getAllUserProfile() {
         return adminServices.getAllUsersProfile();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all_profiles/{MSSV}")
     //Service for ADMIN to get the user profile they want to get by ho_va_ten
-    APIRespond <List<GetProfileRespond>> SearchUserProfile(@PathVariable String MSSV) {
-        return APIRespond.<List<GetProfileRespond>>builder()
-                .result(adminServices.SearchUserProfile(MSSV))
-                .build();
+    List<GetProfileRespond> SearchUserProfile(@PathVariable String MSSV) {
+        return adminServices.SearchUserProfile(MSSV);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/all_profiles/{MSSV}")
     String DeleteUserProfile(@PathVariable String MSSV) {
         adminServices.deleteUserProfile(MSSV);

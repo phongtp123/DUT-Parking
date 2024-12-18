@@ -109,7 +109,6 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
                     getProfileRespond.setSodu(profile.getSodu());
                     getProfileRespond.setDob(profile.getDob());
                     getProfileRespond.setGioitinh(profile.getGioitinh());
-                    getProfileRespond.setRoles(profile.getRoles());
                     return getProfileRespond;
         }).collect(Collectors.toList());
     }
@@ -172,7 +171,6 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
             getProfileRespond.setSodu(profile.getSodu());
             getProfileRespond.setDob(profile.getDob());
             getProfileRespond.setGioitinh(profile.getGioitinh());
-            getProfileRespond.setRoles(profile.getRoles());
             return getProfileRespond;
         }).collect(Collectors.toList());
     }

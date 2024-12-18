@@ -1,30 +1,35 @@
 package com.example.DUT_Parking.DTO;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.sql.Date;
 import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
 public class UpdateRequest {
     String MSSV;
+    @NotNull(message = "INVALID_NAME")
     @NotBlank(message = "INVALID_NAME")
     String hovaten;
-    @NotBlank(message = "INVALID_SDT")
+    @NotNull(message = "INVALID_SDT")
+    @NotBlank(message = "INVALID_NAME")
     String sdt;
-    @NotBlank(message = "INVALID_DIACHI")
+    @NotNull(message = "INVALID_DIACHI")
+    @NotBlank(message = "INVALID_NAME")
     String diachi;
-    @NotBlank(message = "INVALID_QUEQUAN")
+    @NotNull(message = "INVALID_QUEQUAN")
+    @NotBlank(message = "INVALID_NAME")
     String quequan;
-    @NotBlank(message = "INVALID_GENDER")
+    @NotNull(message = "INVALID_GENDER")
+    @NotBlank(message = "INVALID_NAME")
     String gioitinh;
-    LocalDate dob;
+    Date dob;
 
 }

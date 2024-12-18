@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.sql.Date;
 import java.util.Set;
 
 @Data
@@ -16,10 +17,9 @@ public class GetProfileRespond {
     String email;
     String hovaten;
     String gioitinh;
-    LocalDate dob;
+    Date dob;
     String diachi;
     String quequan;
     String sdt;
     long sodu;
-    Set<String> roles;
 }
