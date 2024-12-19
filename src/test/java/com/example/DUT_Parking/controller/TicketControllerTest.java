@@ -8,6 +8,7 @@ import com.example.DUT_Parking.services.AdminServices;
 import com.example.DUT_Parking.services.RegisterService;
 import com.example.DUT_Parking.services.UserServices;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apiguardian.api.API;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +32,7 @@ import java.sql.Date;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -383,5 +385,319 @@ public class TicketControllerTest {
                 .andExpect(jsonPath("message").value("Unauthenticated"));
     }
 
-    //Test
+    //Test for DELETE /services/ticket/my-tickets-list/{id}
+    @Test
+    @DisplayName("Test delete ticket only by User in User Ticket List - Delete Success")
+    @WithMockUser(username = "test@gmail.com")
+    void testDeleteTicketInUserTicketList_onlyByUser_Success() throws Exception {
+        var id = 1L;
+
+        Mockito.doNothing().when(userServices).UserDeleteTicket(any());
+
+        objectMapper = new ObjectMapper();
+        String content = objectMapper.writeValueAsString(id);
+
+        mockMvc.perform(delete("/services/ticket/my-tickets-list/1")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Test delete ticket but expired token - Unauthenticated Failed")
+    @WithAnonymousUser
+    void testDeleteTicketInUserTicketList_ExpiredToken_Failed() throws Exception {
+        var id = 1L;
+
+        Mockito.doNothing().when(userServices).UserDeleteTicket(any());
+
+        objectMapper = new ObjectMapper();
+        String content = objectMapper.writeValueAsString(id);
+
+        mockMvc.perform(delete("/services/ticket/my-tickets-list/1")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("code").value(1006))
+                .andExpect(jsonPath("message").value("Unauthenticated"));
+    }
+
+    // Test for POST /services/ticket/my-tickets-list/enable-ticket/{id}
+    @Test
+    @DisplayName("Test enable ticket with valid token - Enable Success")
+    @WithMockUser(username = "test@gmail.com")
+    void testEnableTicket_WithValidToken_EnableSuccess() throws Exception {
+        EnableTicketRespond enableTicketRespond = EnableTicketRespond.builder()
+                .status(true)
+                .message("Enable ticket success")
+                .ticketToken("abcxyz")
+                .build();
+        APIRespond<EnableTicketRespond> apiRespond = APIRespond.<EnableTicketRespond>builder()
+                .result(enableTicketRespond)
+                .build();
+
+        var id = 1L;
+        objectMapper = new ObjectMapper();
+        String content = objectMapper.writeValueAsString(id);
+
+        Mockito.when(userServices.enableTicket(any())).thenReturn(apiRespond.getResult());
+
+        mockMvc.perform(post("/services/ticket/my-tickets-list/enable-ticket/1")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(content))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("result.status").value(true))
+                .andExpect(jsonPath("result.message").value("Enable ticket success"))
+                .andExpect(jsonPath("result.ticketToken").value("abcxyz"));
+    }
+
+    @Test
+    @DisplayName("Test enable ticket with expired token - Unauthenticated Failed")
+    @WithAnonymousUser
+    void testEnableTicket_WithExpiredToken_EnableFailed() throws Exception {
+        EnableTicketRespond enableTicketRespond = EnableTicketRespond.builder()
+                .status(true)
+                .message("Enable ticket success")
+                .ticketToken("abcxyz")
+                .build();
+        APIRespond<EnableTicketRespond> apiRespond = APIRespond.<EnableTicketRespond>builder()
+                .result(enableTicketRespond)
+                .build();
+
+        var id = 1L;
+        objectMapper = new ObjectMapper();
+        String content = objectMapper.writeValueAsString(id);
+
+        Mockito.when(userServices.enableTicket(any())).thenReturn(apiRespond.getResult());
+
+        mockMvc.perform(post("/services/ticket/my-tickets-list/enable-ticket/1")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("code").value(1006))
+                .andExpect(jsonPath("message").value("Unauthenticated"));
+    }
+
+    // Test for GET /services/ticket/all-user-tickets
+    @Test
+    @DisplayName("Test get all user tickets list with Admin role - Get Success")
+    @WithMockUser(username = "admin@gmail.com",roles = {"ADMIN"})
+    void testGetAllUserTicketsList_AdminRole_Success() throws Exception {
+        var expiryLocalDate = LocalDate.of(2025,12,31);
+        Date expiryDate = Date.valueOf(expiryLocalDate);
+        var issueLocalDate = LocalDate.of(2023,12,31);
+        Date issueDate = Date.valueOf(issueLocalDate);
+        var status = "DISABLED";
+
+        GetAllUserTicketsListRespond getAllUserTicketsListRespond = GetAllUserTicketsListRespond.builder()
+                .ticketId("VE01")
+                .ticketName("VE NGAY")
+                .MSSV("12345678")
+                .email("test@gmail.com")
+                .issueDate(issueDate)
+                .expiryDate(expiryDate)
+                .status(status)
+                .menhgia(9999)
+                .build();
+
+        List<GetAllUserTicketsListRespond> getAllUserTicketsListRespondList = Collections
+                .singletonList(getAllUserTicketsListRespond);
+
+        Mockito.when(adminServices.getAllUserTickets()).thenReturn(getAllUserTicketsListRespondList);
+
+        mockMvc.perform(get("/services/ticket/all-user-tickets"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].ticketId").value("VE01"))
+                .andExpect(jsonPath("$[0].ticketName").value("VE NGAY"))
+                .andExpect(jsonPath("$[0].mssv").value("12345678"))
+                .andExpect(jsonPath("$[0].email").value("test@gmail.com"))
+                .andExpect(jsonPath("$[0].issueDate").value(issueDate.toString()))
+                .andExpect(jsonPath("$[0].expiryDate").value(expiryDate.toString()))
+                .andExpect(jsonPath("$[0].status").value(status))
+                .andExpect(jsonPath("$[0].menhgia").value(9999));
+    }
+
+    @Test
+    @DisplayName("Test get all user tickets list with User role - Forbidden Failed")
+    @WithMockUser(username = "test@gmail.com")
+    void testGetAllUserTicketsList_UserRole_Failed() throws Exception {
+        var expiryLocalDate = LocalDate.of(2025,12,31);
+        Date expiryDate = Date.valueOf(expiryLocalDate);
+        var issueLocalDate = LocalDate.of(2023,12,31);
+        Date issueDate = Date.valueOf(issueLocalDate);
+        var status = "DISABLED";
+
+        GetAllUserTicketsListRespond getAllUserTicketsListRespond = GetAllUserTicketsListRespond.builder()
+                .ticketId("VE01")
+                .ticketName("VE NGAY")
+                .MSSV("12345678")
+                .email("test@gmail.com")
+                .issueDate(issueDate)
+                .expiryDate(expiryDate)
+                .status(status)
+                .menhgia(9999)
+                .build();
+
+        List<GetAllUserTicketsListRespond> getAllUserTicketsListRespondList = Collections
+                .singletonList(getAllUserTicketsListRespond);
+
+        Mockito.when(adminServices.getAllUserTickets()).thenReturn(getAllUserTicketsListRespondList);
+
+        mockMvc.perform(get("/services/ticket/all-user-tickets"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("code").value(1007))
+                .andExpect(jsonPath("message").value("You do not have permission"));
+    }
+
+    @Test
+    @DisplayName("Test get all user tickets list expired token - Unauthenticated Failed")
+    @WithAnonymousUser
+    void testGetAllUserTicketsList_ExpiredToken_Failed() throws Exception {
+        var expiryLocalDate = LocalDate.of(2025,12,31);
+        Date expiryDate = Date.valueOf(expiryLocalDate);
+        var issueLocalDate = LocalDate.of(2023,12,31);
+        Date issueDate = Date.valueOf(issueLocalDate);
+        var status = "DISABLED";
+
+        GetAllUserTicketsListRespond getAllUserTicketsListRespond = GetAllUserTicketsListRespond.builder()
+                .ticketId("VE01")
+                .ticketName("VE NGAY")
+                .MSSV("12345678")
+                .email("test@gmail.com")
+                .issueDate(issueDate)
+                .expiryDate(expiryDate)
+                .status(status)
+                .menhgia(9999)
+                .build();
+
+        List<GetAllUserTicketsListRespond> getAllUserTicketsListRespondList = Collections
+                .singletonList(getAllUserTicketsListRespond);
+
+        Mockito.when(adminServices.getAllUserTickets()).thenReturn(getAllUserTicketsListRespondList);
+
+        mockMvc.perform(get("/services/ticket/all-user-tickets"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("code").value(1006))
+                .andExpect(jsonPath("message").value("Unauthenticated"));
+    }
+
+    // Test for GET /services/ticket/all-user-tickets/{MSSV}
+    @Test
+    @DisplayName("Test search user tickets list with Admin role - Search Success")
+    @WithMockUser(username = "admin@gmail.com",roles = {"ADMIN"})
+    void testSearchUserTicketsList_AdminRole_Success() throws Exception {
+        var expiryLocalDate = LocalDate.of(2025,12,31);
+        Date expiryDate = Date.valueOf(expiryLocalDate);
+        var issueLocalDate = LocalDate.of(2023,12,31);
+        Date issueDate = Date.valueOf(issueLocalDate);
+        var status = "DISABLED";
+        var mssv = "12345678";
+
+        GetAllUserTicketsListRespond getAllUserTicketsListRespond = GetAllUserTicketsListRespond.builder()
+                .ticketId("VE01")
+                .ticketName("VE NGAY")
+                .MSSV("12345678")
+                .email("test@gmail.com")
+                .issueDate(issueDate)
+                .expiryDate(expiryDate)
+                .status(status)
+                .menhgia(9999)
+                .build();
+
+        List<GetAllUserTicketsListRespond> getAllUserTicketsListRespondList = Collections
+                .singletonList(getAllUserTicketsListRespond);
+
+        objectMapper = new ObjectMapper();
+        String content = objectMapper.writeValueAsString(mssv);
+
+        Mockito.when(adminServices.findUserTicket(any())).thenReturn(getAllUserTicketsListRespondList);
+
+        mockMvc.perform(get("/services/ticket/all-user-tickets/12345678")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].ticketId").value("VE01"))
+                .andExpect(jsonPath("$[0].ticketName").value("VE NGAY"))
+                .andExpect(jsonPath("$[0].mssv").value("12345678"))
+                .andExpect(jsonPath("$[0].email").value("test@gmail.com"))
+                .andExpect(jsonPath("$[0].issueDate").value(issueDate.toString()))
+                .andExpect(jsonPath("$[0].expiryDate").value(expiryDate.toString()))
+                .andExpect(jsonPath("$[0].status").value(status))
+                .andExpect(jsonPath("$[0].menhgia").value(9999));
+    }
+
+    @Test
+    @DisplayName("Test get all user tickets list expired token - Unauthenticated Failed")
+    @WithAnonymousUser
+    void testSearchUserTicketsList_ExpiredToken_Failed() throws Exception {
+        var expiryLocalDate = LocalDate.of(2025,12,31);
+        Date expiryDate = Date.valueOf(expiryLocalDate);
+        var issueLocalDate = LocalDate.of(2023,12,31);
+        Date issueDate = Date.valueOf(issueLocalDate);
+        var status = "DISABLED";
+        var mssv = "12345678";
+
+        GetAllUserTicketsListRespond getAllUserTicketsListRespond = GetAllUserTicketsListRespond.builder()
+                .ticketId("VE01")
+                .ticketName("VE NGAY")
+                .MSSV("12345678")
+                .email("test@gmail.com")
+                .issueDate(issueDate)
+                .expiryDate(expiryDate)
+                .status(status)
+                .menhgia(9999)
+                .build();
+
+        List<GetAllUserTicketsListRespond> getAllUserTicketsListRespondList = Collections
+                .singletonList(getAllUserTicketsListRespond);
+
+        objectMapper = new ObjectMapper();
+        String content = objectMapper.writeValueAsString(mssv);
+
+        Mockito.when(adminServices.findUserTicket(any())).thenReturn(getAllUserTicketsListRespondList);
+
+        mockMvc.perform(get("/services/ticket/all-user-tickets/12345678")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("code").value(1006))
+                .andExpect(jsonPath("message").value("Unauthenticated"));
+    }
+
+    // Test for DELETE /services/ticket/all-user-tickets/{id}
+    @Test
+    @DisplayName("Test delete user ticket only by Admin - Delete Success")
+    @WithMockUser(username = "admin@gmail.com",roles = {"ADMIN"})
+    void testDeleteUserTicket_onlyByAdmin_Success() throws Exception {
+        var id = 1L;
+
+        Mockito.doNothing().when(adminServices).AdminDeleteTicket(any());
+
+        objectMapper = new ObjectMapper();
+        String content = objectMapper.writeValueAsString(id);
+
+        mockMvc.perform(delete("/services/ticket/all-user-tickets/1")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Test delete user ticket expired token - Unauthenticated Failed")
+    @WithAnonymousUser
+    void testDeleteUserTicket_ExpiredToken_Failed() throws Exception {
+        var id = 1L;
+
+        Mockito.doNothing().when(adminServices).AdminDeleteTicket(any());
+
+        objectMapper = new ObjectMapper();
+        String content = objectMapper.writeValueAsString(id);
+
+        mockMvc.perform(delete("/services/ticket/all-user-tickets/1")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("code").value(1006))
+                .andExpect(jsonPath("message").value("Unauthenticated"));
+    }
 }

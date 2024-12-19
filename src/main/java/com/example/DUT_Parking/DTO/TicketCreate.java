@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class TicketCreate {
+    String ticketId;
     String ticketName;
     int menhgia;
 }

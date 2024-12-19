@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -35,12 +36,13 @@ public class PassMonitorController {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/pass-monitor")
-    APIRespond<List<GetAllPassDataRespond>> getAllPassData() throws ParseException {
-        return APIRespond.<List<GetAllPassDataRespond>>builder()
-                .result(adminServices.getAllPassData())
-                .build();
+    List<GetAllPassDataRespond> getAllPassData() throws ParseException {
+        return adminServices.getAllPassData();
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/pass-monitor/reset")
     APIRespond<Void> deletePassData() {
         adminServices.deleteAllPassData();

@@ -129,7 +129,7 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
     }
 
     @Override
-    public void AdminDeleteTicket(String MSSV) {
+    public void AdminDeleteTicket(Long id) {
 
     }
 

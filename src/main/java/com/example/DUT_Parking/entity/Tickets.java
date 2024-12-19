@@ -18,6 +18,7 @@ import java.util.Set;
 public class Tickets {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+    String ticketId;
     String ticketName;
     int menhgia;
     @OneToMany(mappedBy = "tickets" , cascade = CascadeType.ALL)

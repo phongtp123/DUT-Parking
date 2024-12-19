@@ -79,24 +79,20 @@ public class TicketController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/ticket/all-user-tickets")
-    APIRespond<List<GetAllUserTicketsListRespond>> getAllUserTickets(){
-        return APIRespond.<List<GetAllUserTicketsListRespond>>builder()
-                .result(adminServices.getAllUserTickets())
-                .build();
+    List<GetAllUserTicketsListRespond> getAllUserTickets(){
+        return adminServices.getAllUserTickets();
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/ticket/all-user-tickets/{MSSV}")
-    APIRespond<List<GetAllUserTicketsListRespond>> findUserTicket(@PathVariable String MSSV){
-        return APIRespond.<List<GetAllUserTicketsListRespond>>builder()
-                .result(adminServices.findUserTicket(MSSV))
-                .build();
+    List<GetAllUserTicketsListRespond> findUserTicket(@PathVariable String MSSV){
+        return adminServices.findUserTicket(MSSV);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/ticket/all-user-tickets/{MSSV}")
-    APIRespond<Void> AdminDeleteTicket(@PathVariable String MSSV){
-        adminServices.AdminDeleteTicket(MSSV);
+    @DeleteMapping("/ticket/all-user-tickets/{id}")
+    APIRespond<Void> AdminDeleteTicket(@PathVariable Long id){
+        adminServices.AdminDeleteTicket(id);
         return APIRespond.<Void>builder().build();
     }
 

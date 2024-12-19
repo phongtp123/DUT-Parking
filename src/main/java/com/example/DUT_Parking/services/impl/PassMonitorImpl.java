@@ -91,7 +91,7 @@ public class PassMonitorImpl implements PassMonitorService , AdminServices {
     }
 
     @Override
-    public void AdminDeleteTicket(String MSSV) {
+    public void AdminDeleteTicket(Long id) {
 
     }
 

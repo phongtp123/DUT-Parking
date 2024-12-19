@@ -12,7 +12,7 @@ import java.util.Date;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GetAllUserTicketsListRespond {
-    Long ticketId;
+    String ticketId;
     String email;
     String MSSV;
     String ticketName;

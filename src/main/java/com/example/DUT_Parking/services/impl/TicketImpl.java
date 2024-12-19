@@ -47,6 +47,7 @@ public class TicketImpl implements UserServices, AdminServices {
 
     public TicketRespond createTicket(TicketCreate request) {
         Tickets tickets = Tickets.builder()
+                .ticketId(request.getTicketId())
                 .ticketName(request.getTicketName())
                 .menhgia(request.getMenhgia())
                 .build();
@@ -116,8 +117,8 @@ public class TicketImpl implements UserServices, AdminServices {
     }
 
     @Transactional
-    public void AdminDeleteTicket(String MSSV) {
-        userTicketsRepo.deleteByMSSV(MSSV);
+    public void AdminDeleteTicket(Long id) {
+        userTicketsRepo.deleteById(id);
     }
 
     public  List<GetAllUserTicketsListRespond> getAllUserTickets() {
@@ -128,7 +129,7 @@ public class TicketImpl implements UserServices, AdminServices {
             var ticketType = userTicketsInfo.getTickets();
             var profile = userTicketsInfo.getUsersProfile();
             GetAllUserTicketsListRespond getAllUserTicketsListRespond = new GetAllUserTicketsListRespond();
-            getAllUserTicketsListRespond.setTicketId(userTicketsInfo.getId());
+            getAllUserTicketsListRespond.setTicketId(ticketType.getTicketId());
             getAllUserTicketsListRespond.setEmail(profile.getEmail());
             getAllUserTicketsListRespond.setMSSV(profile.getMSSV());
             getAllUserTicketsListRespond.setTicketName(ticketType.getTicketName());
@@ -149,7 +150,7 @@ public class TicketImpl implements UserServices, AdminServices {
             var ticketType = ticket.getTickets();
             var profile = ticket.getUsersProfile();
             GetAllUserTicketsListRespond respond = GetAllUserTicketsListRespond.builder()
-                    .ticketId(ticket.getId())
+                    .ticketId(ticketType.getTicketId())
                     .email(profile.getEmail())
                     .MSSV(profile.getMSSV())
                     .ticketName(ticketType.getTicketName())
