@@ -23,6 +23,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import net.glxn.qrgen.core.image.ImageType;
 import net.glxn.qrgen.javase.QRCode;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -113,12 +114,20 @@ public class TicketImpl implements UserServices, AdminServices {
 
     @Transactional
     public void UserDeleteTicket(Long id) {
-        userTicketsRepo.deleteById(id);
+        try {
+            userTicketsRepo.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new AppException(ErrorCode.TICKET_NOT_EXISTED);
+        }
     }
 
     @Transactional
     public void AdminDeleteTicket(Long id) {
-        userTicketsRepo.deleteById(id);
+        try {
+            userTicketsRepo.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new AppException(ErrorCode.TICKET_NOT_EXISTED);
+        }
     }
 
     public  List<GetAllUserTicketsListRespond> getAllUserTickets() {
@@ -212,7 +221,11 @@ public class TicketImpl implements UserServices, AdminServices {
 
     @Transactional
     public void deleteTicket(String ticketId) {
-        ticketsRepo.deleteById(ticketId);
+        try {
+            ticketsRepo.deleteById(ticketId);
+        } catch (EmptyResultDataAccessException e){
+            throw new AppException(ErrorCode.TICKET_NOT_EXISTED);
+        }
     }
 
     private String generateTicket(Long id) {

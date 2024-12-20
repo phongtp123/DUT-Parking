@@ -50,7 +50,7 @@ public class RegisterController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/registered_users/{id}")
-    String deleteUser(@PathVariable("id") int id) {
+    String deleteUser(@PathVariable("id") Long id) {
         registerService.delete(id);
         return "User has been deleted";
     }

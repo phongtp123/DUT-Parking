@@ -269,7 +269,7 @@ public class RegisterControllerTest {
 
         String respond = "User has been deleted";
 
-        Mockito.doNothing().when(registerService).delete(Mockito.anyInt());
+        Mockito.doNothing().when(registerService).delete(Mockito.anyLong());
 
         // Thực thi API
         mockMvc.perform(delete("/auth/registered_users/1")
@@ -286,7 +286,7 @@ public class RegisterControllerTest {
 
         String respond = "User has been deleted";
 
-        Mockito.doNothing().when(registerService).delete(Mockito.anyInt());
+        Mockito.doNothing().when(registerService).delete(Mockito.anyLong());
 
         // Thực thi API
         mockMvc.perform(delete("/auth/registered_users/1")
@@ -304,7 +304,7 @@ public class RegisterControllerTest {
 
         String respond = "User has been deleted";
 
-        Mockito.doNothing().when(registerService).delete(Mockito.anyInt());
+        Mockito.doNothing().when(registerService).delete(Mockito.anyLong());
 
         // Thực thi API
         mockMvc.perform(delete("/auth/registered_users/1")

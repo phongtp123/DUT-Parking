@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -79,7 +80,11 @@ public class RegisterImpl implements RegisterService {
     }
 
     @Transactional
-    public void delete(int id) {
-        registeredUserRepo.deleteById(id);
+    public void delete(Long id) {
+        try {
+            registeredUserRepo.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
     }
 }

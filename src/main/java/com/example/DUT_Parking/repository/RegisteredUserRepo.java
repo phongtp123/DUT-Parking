@@ -9,5 +9,5 @@ public interface RegisteredUserRepo extends JpaRepository<RegisteredUsers, Strin
     boolean existsByEmail(String email);
     RegisteredUsers findByEmail(String email);
     RegisteredUsers findByPassword(String password);
-    void deleteById(int id);
+    void deleteById(Long id);
 }

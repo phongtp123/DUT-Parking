@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -155,7 +156,11 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
 
     @Transactional
     public void deleteUserProfile (String MSSV) {
-        usersProfileRepo.deleteById(MSSV);
+        try {
+            usersProfileRepo.deleteById(MSSV);
+        } catch (EmptyResultDataAccessException e) {
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
     }
 
     public List<GetProfileRespond> getAllUsersProfile() {

@@ -1,6 +1,7 @@
 package com.example.DUT_Parking.exception_handling;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -73,6 +74,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = DataIntegrityViolationException.class)
     ResponseEntity<APIRespond> handlingDataIntegrityViolationException(DataIntegrityViolationException exception) {
         ErrorCode errorCode = ErrorCode.EMAIL_EXISTED;
+
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(APIRespond.builder()
+                        .code(errorCode.getCode())
+                        .message(errorCode.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(value = EmptyResultDataAccessException.class)
+    ResponseEntity<APIRespond> handlingEmptyResultDataAccessException(EmptyResultDataAccessException exception) {
+        ErrorCode errorCode = ErrorCode.USER_NOT_EXISTED;
 
         return ResponseEntity.status(errorCode.getStatusCode())
                 .body(APIRespond.builder()

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.Collections;
 import java.util.List;
@@ -53,7 +54,7 @@ public class RegisterServiceTest {
         assertEquals("password", respond.get(0).getPassword());
     }
 
-    // Test for func register()
+    // Test for func register(RegisterRequest request)
     @Test
     @DisplayName("Test register function - register success")
     void testRegister_Success() {
@@ -91,18 +92,73 @@ public class RegisterServiceTest {
                 .password("password")
                 .build();
 
+        Mockito.doThrow(DataIntegrityViolationException.class)
+                .when(registeredUserRepo)
+                .save(Mockito.any(RegisteredUsers.class));
+
+        var exception = assertThrows(AppException.class, () -> registerService.register(registerRequest));
+
+        assertEquals(1002, exception.getErrorCode().getCode());
+        assertEquals("Email existed!", exception.getMessage());
+    }
+
+    //Test for func search(String email)
+    @Test
+    @DisplayName("Test search function - Search success")
+    void testSearch_Success() {
+
         RegisteredUsers registeredUsers = RegisteredUsers.builder()
                 .id(1L)
                 .email("test@gmail.com")
                 .password("password")
                 .build();
 
+        var email = "test@gmail.com";
 
-        Mockito.when(registeredUserRepo.save(registeredUsers)).thenReturn(registeredUsers);
+        Mockito.when(registeredUserRepo.findByEmail(email)).thenReturn(registeredUsers);
 
-        var exception = assertThrows(AppException.class, () -> registerService.register(registerRequest));
+        var respond = registerService.search(email);
 
-        assertEquals( 1002 , exception.getErrorCode().getCode() );
-        assertEquals("Email existed!" , exception.getMessage());
+        assertEquals(1L , respond.getId());
+        assertEquals("test@gmail.com", respond.getEmail());
+        assertEquals("password", respond.getPassword());
+    }
+
+    @Test
+    @DisplayName("Test search function - USER_NOT_EXISTED failed")
+    void testSearch_Failed() {
+
+        var email = "test@gmail.com";
+
+        Mockito.when(registeredUserRepo.findByEmail(email)).thenReturn(null);
+
+        var exception = Assertions.assertThrows(AppException.class, () -> registerService.search(email));
+
+        assertEquals(1005 , exception.getErrorCode().getCode());
+        assertEquals("User not existed", exception.getMessage());
+    }
+
+    // Test for func delete(int id)
+    @Test
+    @DisplayName("Test delete function - Delete success")
+    void testDelete_Success() {
+        Long id = 1L;
+
+        Mockito.doNothing().when(registeredUserRepo).deleteById(id);
+
+        registerService.delete(id);
+    }
+
+    @Test
+    @DisplayName("Test delete function - USER_NOT_EXISTED failed")
+    void testDelete_Failed() {
+
+        Mockito.doThrow(EmptyResultDataAccessException.class)
+                .when(registeredUserRepo).deleteById(Mockito.anyLong());
+
+        var exception = assertThrows(AppException.class, () -> registerService.delete(Mockito.anyLong()));
+
+        assertEquals(1005, exception.getErrorCode().getCode());
+        assertEquals("User not existed", exception.getMessage());
     }
 }
