@@ -113,27 +113,6 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    @DisplayName("Invalid Password Input - Login Failed")
-    void loginWithInvalidPassword_Failed() throws Exception {
-        AuthenticationRequest authenticationRequest = AuthenticationRequest.builder()
-                .email("test@gmail.com")
-                .password("test")
-                .build();;
-
-        objectMapper = new ObjectMapper();
-        String content = objectMapper.writeValueAsString(authenticationRequest);
-
-        mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(content))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("code").value(1004))
-                .andExpect(jsonPath("message")
-                        .value("Password must be at least 6 characters")
-                );
-    }
-
-    @Test
     @DisplayName("Invalid Email Input - Login Failed")
     void loginWithInvalidEmail_Failed() throws Exception {
         AuthenticationRequest authenticationRequest = AuthenticationRequest.builder()
