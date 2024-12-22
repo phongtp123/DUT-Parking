@@ -4,6 +4,7 @@ import com.example.DUT_Parking.DTO.BuyTicketRequest;
 import com.example.DUT_Parking.DTO.EnableTicketRequest;
 import com.example.DUT_Parking.DTO.RechargeRequest;
 import com.example.DUT_Parking.DTO.UpdateRequest;
+import com.example.DUT_Parking.configuration.SecurityHolder;
 import com.example.DUT_Parking.entity.UsersProfile;
 import com.example.DUT_Parking.repository.UsersProfileRepo;
 import com.example.DUT_Parking.respond.*;
@@ -22,6 +23,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE , makeFinal = true)
 public class RechargeImpl implements UserServices {
     UsersProfileRepo usersProfileRepo;
+    SecurityHolder securityHolder;
 
     @Override
     public UpdateRespond UpdateProfile(UpdateRequest user_profile) {
@@ -34,7 +36,7 @@ public class RechargeImpl implements UserServices {
     }
 
     public RechargeRespond recharge(RechargeRequest request) {
-        var info = SecurityContextHolder.getContext();
+        var info = securityHolder.getContext();
         String name = info.getAuthentication().getName();
         UsersProfile usersProfile = usersProfileRepo.findByEmail(name);
         var last_sodu = usersProfile.getSodu();

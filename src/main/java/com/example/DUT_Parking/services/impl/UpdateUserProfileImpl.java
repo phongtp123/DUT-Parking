@@ -1,6 +1,7 @@
 package com.example.DUT_Parking.services.impl;
 
 import com.example.DUT_Parking.DTO.*;
+import com.example.DUT_Parking.configuration.SecurityHolder;
 import com.example.DUT_Parking.entity.PassMonitor;
 import com.example.DUT_Parking.entity.UserTicketsInfo;
 import com.example.DUT_Parking.entity.UsersProfile;
@@ -27,9 +28,10 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE , makeFinal = true)
 public class UpdateUserProfileImpl implements UserServices , AdminServices {
     UsersProfileRepo usersProfileRepo;
+    SecurityHolder securityHolder;
 
     public UpdateRespond UpdateProfile (UpdateRequest user_profile) {
-        var info = SecurityContextHolder.getContext();
+        var info = securityHolder.getContext();
         String name = info.getAuthentication().getName();
         UsersProfile userProfile = usersProfileRepo.findByEmail(name);
         userProfile.setMSSV(user_profile.getMSSV());
@@ -50,12 +52,9 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
     }
 
     public GetProfileRespond GetUserProfile () {
-        var info = SecurityContextHolder.getContext();
+        var info = securityHolder.getContext();
         String name = info.getAuthentication().getName();
         UsersProfile usersProfile = usersProfileRepo.findByEmail(name);
-        if (usersProfile == null) {
-            throw new AppException(ErrorCode.USER_NOT_EXISTED);
-        }
         return GetProfileRespond.builder()
                 .MSSV(usersProfile.getMSSV())
                 .email(usersProfile.getEmail())
@@ -155,7 +154,7 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
     }
 
     @Transactional
-    public void deleteUserProfile (String MSSV) {
+    public void deleteUserProfile (String MSSV) throws AppException {
         try {
             usersProfileRepo.deleteById(MSSV);
         } catch (EmptyResultDataAccessException e) {

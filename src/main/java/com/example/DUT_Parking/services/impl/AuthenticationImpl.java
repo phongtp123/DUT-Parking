@@ -19,12 +19,14 @@ import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -46,11 +48,12 @@ public class AuthenticationImpl implements AuthenticationService {
         RegisteredUserRepo registeredUserRepo;
         LoginUserRepo loginUserRepo;
         LogoutUserRepo logoutUserRepo;
+        com.example.DUT_Parking.configuration.JWTParser jwtParser;
 
         @NonFinal
-        protected static final String signer_key = "4B8SWV0opYWRgxeKoKost+CvEfqKhCPV0G1SFgU6V1vLOLbBWo5hE1JhpQUV7gWL";
+        public static final String signer_key = "4B8SWV0opYWRgxeKoKost+CvEfqKhCPV0G1SFgU6V1vLOLbBWo5hE1JhpQUV7gWL";
 
-        public AuthenticationRespond authenticated(AuthenticationRequest request) {
+        public AuthenticationRespond authenticated(AuthenticationRequest request) throws JOSEException {
                 var registeredUser = registeredUserRepo.findByEmail(request.getEmail());
                 var user = usersProfileRepo.findByEmail(request.getEmail());
                 if (registeredUser == null) {
@@ -104,7 +107,7 @@ public class AuthenticationImpl implements AuthenticationService {
                 logoutUserRepo.save(logoutUsers);
         }
 
-        private String generateToken(UsersProfile usersProfile) {
+        public String generateToken(UsersProfile usersProfile) throws JOSEException{
                 //Header voi thuat toan JWS HS512
                 JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
                 //Claimset va Payload
@@ -125,8 +128,7 @@ public class AuthenticationImpl implements AuthenticationService {
                         jwsObject.sign(new MACSigner(signer_key.getBytes()));
                         return jwsObject.serialize();
                 } catch (JOSEException e) {
-                        log.error("Cannot create token", e);
-                        throw new RuntimeException(e);
+                        throw new AppException(ErrorCode.JOSEE_EXCEPTION);
                 }
         }
 
@@ -155,13 +157,16 @@ public class AuthenticationImpl implements AuthenticationService {
 
         }
 
-        private SignedJWT verify_token(String token) throws ParseException, JOSEException {
+        public SignedJWT verify_token(String token) throws ParseException, JOSEException , AppException {
                 JWSVerifier verifier = new MACVerifier(signer_key.getBytes());
-                SignedJWT signedJWT = SignedJWT.parse(token);
+                SignedJWT signedJWT = jwtParser.parse(token);
                 Date expirationDate = signedJWT.getJWTClaimsSet().getExpirationTime();
                 var registeredUser = registeredUserRepo.findByEmail(signedJWT.getJWTClaimsSet().getSubject());
                 var validation = signedJWT.verify(verifier);
-                if (!(validation && expirationDate.after(new Date()))){
+                if (!validation){
+                        throw new AppException(ErrorCode.UNAUTHENTICATED);
+                }
+                if (!expirationDate.after(new Date())) {
                         throw new AppException(ErrorCode.UNAUTHENTICATED);
                 }
                 if (logoutUserRepo.existsByRegisteredUsers(registeredUser)) {

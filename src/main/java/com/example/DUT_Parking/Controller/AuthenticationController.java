@@ -24,7 +24,7 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
 
     @PostMapping ("/login")
-    APIRespond <AuthenticationRespond> authenticated(@RequestBody @Valid AuthenticationRequest request) {
+    APIRespond <AuthenticationRespond> authenticated(@RequestBody @Valid AuthenticationRequest request) throws JOSEException {
         var result = authenticationService.authenticated(request);
         return APIRespond.<AuthenticationRespond>builder()
                 .result(result)
