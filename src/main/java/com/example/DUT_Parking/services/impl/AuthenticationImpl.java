@@ -68,23 +68,20 @@ public class AuthenticationImpl implements AuthenticationService {
                                 LoginUsers loginUser = new LoginUsers();
                                 loginUser.setRegisteredUsers(registeredUser);
                                 loginUser.setEmail(registeredUser.getEmail());
-                                if (loginUserRepo.findByRegisteredUsers(registeredUser) != null) {
-                                        return AuthenticationRespond.builder()
-                                                .token(token)
-                                                .authenticated(true)
-                                                .build();
-                                }
-                                else {
+                                var loginUsersList = loginUserRepo.findByRegisteredUsers(registeredUser);
+                                if (loginUsersList == null) {
                                         loginUserRepo.save(loginUser);
-                                        return AuthenticationRespond.builder()
-                                                .token(token)
-                                                .authenticated(true)
-                                                .build();
                                 }
+                                return AuthenticationRespond.builder()
+                                        .token(token)
+                                        .authenticated(true)
+                                        .build();
                         }
                         else {
-                                if (loginUserRepo.findByRegisteredUsers(registeredUser) != null){
-                                        loginUserRepo.delete(loginUserRepo.findByRegisteredUsers(registeredUser));
+                                var loginUsersList = loginUserRepo.findByRegisteredUsers(registeredUser);
+                                if (loginUsersList != null)
+                                {
+                                        loginUserRepo.delete(loginUsersList);
                                 }
                                 throw new AppException(ErrorCode.UNAUTHENTICATED);
                         }

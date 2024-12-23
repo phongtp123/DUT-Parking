@@ -22,7 +22,10 @@ public class UsersProfile {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String MSSV;
+
+    @Column(nullable = false, unique = true)
     String email;
+
     String password;
     String hovaten;
     String gioitinh;

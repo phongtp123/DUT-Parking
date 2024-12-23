@@ -14,11 +14,13 @@ import org.apache.catalina.User;
 @Builder
 public class LoginUsers {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     @OneToOne
     @MapsId
     @JsonIgnore
     RegisteredUsers registeredUsers;
 
+    @Column(nullable = false, unique = true)
     String email;
 }

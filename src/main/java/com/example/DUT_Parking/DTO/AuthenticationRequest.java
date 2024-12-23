@@ -17,5 +17,6 @@ public class AuthenticationRequest {
     @NotNull(message = "EMAIL_INVALID")
     @Pattern(regexp = "^[a-zA-Z0-9]+@gmail\\.com$" , message = "EMAIL_INVALID")
     String email;
+    @NotNull(message = "INVALID_PASSWORD")
     String password;
 }

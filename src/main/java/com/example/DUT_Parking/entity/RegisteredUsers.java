@@ -15,6 +15,7 @@ public class RegisteredUsers {
     Long id;
     @Column(name = "email" , unique = true , columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
     String email;
+    @Column(nullable = false)
     String password;
     @OneToOne(mappedBy = "registeredUsers", cascade = CascadeType.ALL)
     LoginUsers loginUsers;
