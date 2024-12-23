@@ -2,6 +2,7 @@ package com.example.DUT_Parking.services.impl;
 
 import com.example.DUT_Parking.DTO.PassRequest;
 import com.example.DUT_Parking.DTO.TicketCreate;
+import com.example.DUT_Parking.configuration.JWTParser;
 import com.example.DUT_Parking.entity.PassMonitor;
 import com.example.DUT_Parking.entity.Tickets;
 import com.example.DUT_Parking.entity.UserTicketsInfo;
@@ -34,14 +35,15 @@ public class PassMonitorImpl implements PassMonitorService , AdminServices {
     PassMonitorRepo passMonitorRepo;
     UserTicketsRepo userTicketsRepo;
     UsersProfileRepo usersProfileRepo;
+    JWTParser jwtParser;
 
     public void HandlePassData (PassRequest request) throws ParseException {
-        SignedJWT passToken = SignedJWT.parse(request.getPassToken());
+        SignedJWT passToken = jwtParser.parse(request.getPassToken());
         JWTClaimsSet claims = passToken.getJWTClaimsSet();
         Long id = claims.getLongClaim("id");
-        String hovaten = claims.getStringClaim("hovaten");
-        String email = claims.getStringClaim("email");
-        String ticketName = claims.getStringClaim("ticketName");
+//        String hovaten = claims.getStringClaim("hovaten");
+//        String email = claims.getStringClaim("email");
+//        String ticketName = claims.getStringClaim("ticketName");
         String decision = claims.getStringClaim("decision");
         var ticket = userTicketsRepo.findById(id);
         //var ticketType = ticket.getTickets();
@@ -56,6 +58,7 @@ public class PassMonitorImpl implements PassMonitorService , AdminServices {
         }
         profile.getPassMonitors().add(passMonitor);
         ticket.getPassMonitors().add(passMonitor);
+        passMonitorRepo.save(passMonitor);
         userTicketsRepo.save(ticket);
         usersProfileRepo.save(profile);
     }

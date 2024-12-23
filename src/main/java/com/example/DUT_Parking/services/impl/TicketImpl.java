@@ -1,6 +1,8 @@
 package com.example.DUT_Parking.services.impl;
 
 import com.example.DUT_Parking.DTO.*;
+import com.example.DUT_Parking.configuration.JWTParser;
+import com.example.DUT_Parking.configuration.SecurityHolder;
 import com.example.DUT_Parking.entity.*;
 import com.example.DUT_Parking.enums.TicketStatus;
 import com.example.DUT_Parking.exception_handling.AppException;
@@ -45,6 +47,8 @@ public class TicketImpl implements UserServices, AdminServices {
     TicketsRepo ticketsRepo;
     TicketMapper ticketMapper;
     UserTicketsRepo userTicketsRepo;
+    SecurityHolder securityHolder;
+    JWTParser jwtParser;
 
     public TicketRespond createTicket(TicketCreate request) {
         Tickets tickets = Tickets.builder()
@@ -58,11 +62,14 @@ public class TicketImpl implements UserServices, AdminServices {
                 .build();
     }
 
-    public BuyTicketRespond buyTicket(BuyTicketRequest request) {
-        var info = SecurityContextHolder.getContext();
+    public BuyTicketRespond buyTicket(BuyTicketRequest request) throws AppException {
+        var info = securityHolder.getContext();
         var rawinfo = info.getAuthentication().getName();
         UsersProfile userinfo = usersProfileRepo.findByEmail(rawinfo);
         Tickets ticketType = ticketsRepo.findByTicketName(request.getName());
+        if (ticketType == null) {
+            throw new AppException(ErrorCode.TICKET_NOT_EXISTED);
+        }
         var menhgia = ticketType.getMenhgia();
         var ticketName = ticketType.getTicketName();
         var status = TicketStatus.DISABLE.name();
@@ -89,7 +96,7 @@ public class TicketImpl implements UserServices, AdminServices {
     }
 
     public List<GetUserTicketsListRespond> getUserTicketsList() {
-        var getInfo = SecurityContextHolder.getContext().getAuthentication().getName();
+        var getInfo = securityHolder.getContext().getAuthentication().getName();
         List<UserTicketsInfo> ticketsList = userTicketsRepo.findAllByEmail(getInfo);
 
         List<GetUserTicketsListRespond> ticketsListRespond = new ArrayList<>();
@@ -150,8 +157,11 @@ public class TicketImpl implements UserServices, AdminServices {
         }).collect(Collectors.toList());
     }
 
-    public List<GetAllUserTicketsListRespond> findUserTicket (String MSSV) {
+    public List<GetAllUserTicketsListRespond> findUserTicket (String MSSV) throws AppException {
         List<UserTicketsInfo> userTicketsList = userTicketsRepo.findAllByMSSV(MSSV);
+        if (userTicketsList.isEmpty()) {
+            throw new AppException(ErrorCode.MSSV_NOT_EXISTED);
+        }
 
         List<GetAllUserTicketsListRespond> ticketsListRespond = new ArrayList<>();
 
@@ -184,13 +194,16 @@ public class TicketImpl implements UserServices, AdminServices {
 
     }
 
-    public EnableTicketRespond enableTicket(Long id) throws ParseException {
+    public EnableTicketRespond enableTicket(Long id) throws ParseException,AppException {
 
         var requestTicket = userTicketsRepo.findById(id);
+        if (requestTicket == null) {
+            throw new AppException(ErrorCode.TICKET_NOT_EXISTED);
+        }
         requestTicket.setStatus(TicketStatus.ENABLE.name());
 
         var ticket_token = generateTicket(id);
-        var ticket_info = ticketInfo(ticket_token);
+        var ticket_info = jwtParser.parse(ticket_token);
         var issueDate = ticket_info.getJWTClaimsSet().getIssueTime();
         var expiryDate = ticket_info.getJWTClaimsSet().getExpirationTime();
         requestTicket.setIssueDate(issueDate);
@@ -202,10 +215,6 @@ public class TicketImpl implements UserServices, AdminServices {
                 .message("Enable ticket success")
                 .ticketToken(ticket_token)
                 .build();
-    }
-
-    private SignedJWT ticketInfo (String token) throws ParseException {
-        return SignedJWT.parse(token);
     }
 
     public List<GetTicketTypeList> getAllTickets() {
@@ -228,7 +237,7 @@ public class TicketImpl implements UserServices, AdminServices {
         }
     }
 
-    private String generateTicket(Long id) {
+    public String generateTicket(Long id) throws AppException {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
         UserTicketsInfo ticket = userTicketsRepo.findById(id);
         var ticketType = ticket.getTickets();
@@ -255,8 +264,7 @@ public class TicketImpl implements UserServices, AdminServices {
             jwsObject.sign(new MACSigner(base64EncodedKey));
             return jwsObject.serialize();
         } catch (JOSEException e) {
-            log.error("Cannot generate ticket" ,e);
-            throw new RuntimeException(e);
+            throw new AppException(ErrorCode.JOSEE_EXCEPTION);
         }
     }
 
@@ -283,7 +291,7 @@ public class TicketImpl implements UserServices, AdminServices {
     }
 
 
-    private byte[] qr_code_maker(String ticket_token) {
+    public byte[] qr_code_maker(String ticket_token) {
         var data = ticket_token;
         ByteArrayOutputStream stream = QRCode.from(data).withSize(250 , 250).to(ImageType.PNG)
                 .stream();
