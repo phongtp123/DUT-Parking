@@ -19,17 +19,18 @@ public class UpdateRequest {
     @NotBlank(message = "INVALID_NAME")
     String hovaten;
     @NotNull(message = "INVALID_SDT")
-    @NotBlank(message = "INVALID_NAME")
+    @NotBlank(message = "INVALID_SDT")
     String sdt;
     @NotNull(message = "INVALID_DIACHI")
-    @NotBlank(message = "INVALID_NAME")
+    @NotBlank(message = "INVALID_DIACHI")
     String diachi;
     @NotNull(message = "INVALID_QUEQUAN")
-    @NotBlank(message = "INVALID_NAME")
+    @NotBlank(message = "INVALID_QUEQUAN")
     String quequan;
     @NotNull(message = "INVALID_GENDER")
-    @NotBlank(message = "INVALID_NAME")
+    @NotBlank(message = "INVALID_GENDER")
     String gioitinh;
+    @Age(message = "INVALID_DOB")
     Date dob;
 
 }

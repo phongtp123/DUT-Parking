@@ -1,16 +1,10 @@
 package com.example.DUT_Parking.controller;
 
-import com.example.DUT_Parking.DTO.AuthenticationRequest;
-import com.example.DUT_Parking.DTO.IntrospectLoginToken;
-import com.example.DUT_Parking.DTO.LogoutRequest;
 import com.example.DUT_Parking.DTO.UpdateRequest;
 import com.example.DUT_Parking.respond.*;
 import com.example.DUT_Parking.services.AdminServices;
-import com.example.DUT_Parking.services.AuthenticationService;
 import com.example.DUT_Parking.services.UserServices;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -56,7 +50,7 @@ public class UserProfileControllerTest {
     @DisplayName("Test Get User Profile With Valid Token - Get Success")
     @WithMockUser(username = "test@gmail.com")
     void testGetUserProfile_ValidToken_Success() throws Exception {
-        var localDate = LocalDate.of(2025,12,31);
+        var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
         GetProfileRespond getProfileRespond = GetProfileRespond.builder()
                 .MSSV("12345678")
@@ -91,7 +85,7 @@ public class UserProfileControllerTest {
     @DisplayName("Test Get User Profile With Expired Token - Get Failed")
     @WithAnonymousUser
     void testGetUserProfile_ExpiredToken_Failed() throws Exception {
-        var localDate = LocalDate.of(2025,12,31);
+        var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
         GetProfileRespond getProfileRespond = GetProfileRespond.builder()
                 .MSSV("12345678")
@@ -121,7 +115,7 @@ public class UserProfileControllerTest {
     @DisplayName("Test Update User Profile With Valid Token - Update Success")
     @WithMockUser(username = "test@gmail.com")
     void testUpdateUserProfile_ValidToken_Success() throws Exception {
-        var localDate = LocalDate.of(2025,12,31);
+        var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
         UpdateRequest updateRequest = UpdateRequest.builder()
                 .MSSV("12345678")
@@ -159,7 +153,7 @@ public class UserProfileControllerTest {
     @DisplayName("Test Update User Profile With Expired Token - Update Failed")
     @WithAnonymousUser
     void testUpdateUserProfile_ExpiredToken_Failed() throws Exception {
-        var localDate = LocalDate.of(2025,12,31);
+        var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
         UpdateRequest updateRequest = UpdateRequest.builder()
                 .MSSV("12345678")
@@ -193,12 +187,180 @@ public class UserProfileControllerTest {
                 .andExpect(jsonPath("message").value("Unauthenticated"));
     }
 
+    @Test
+    @DisplayName("Test Update User Profile Null or Blank Name - Update Failed")
+    @WithMockUser(username = "test@gmail.com")
+    void testUpdateUserProfile_InvalidName_Failed() throws Exception {
+        var localDate = LocalDate.now().minusYears(20);
+        var dob = Date.valueOf(localDate);
+        UpdateRequest updateRequest = UpdateRequest.builder()
+                .MSSV("12345678")
+                .hovaten(null)
+                .sdt("123456789")
+                .diachi("test")
+                .quequan("test")
+                .gioitinh("test")
+                .dob(dob)
+                .build();
+
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String content = objectMapper.writeValueAsString(updateRequest);
+
+        mockMvc.perform(put("/profile/my_profile/update")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("code").value(1009))
+                .andExpect(jsonPath("message").value("Họ và tên không được bỏ trống"));
+    }
+
+    @Test
+    @DisplayName("Test Update User Profile Null or Blank Phone Number - Update Failed")
+    @WithMockUser(username = "test@gmail.com")
+    void testUpdateUserProfile_InvalidSDT_Failed() throws Exception {
+        var localDate = LocalDate.now().minusYears(20);
+        var dob = Date.valueOf(localDate);
+        UpdateRequest updateRequest = UpdateRequest.builder()
+                .MSSV("12345678")
+                .hovaten("Nguyễn Thanh Phong")
+                .sdt(null)
+                .diachi("test")
+                .quequan("test")
+                .gioitinh("test")
+                .dob(dob)
+                .build();
+
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String content = objectMapper.writeValueAsString(updateRequest);
+
+        mockMvc.perform(put("/profile/my_profile/update")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("code").value(1013))
+                .andExpect(jsonPath("message").value("Số điện thoại không được bỏ trống"));
+    }
+
+    @Test
+    @DisplayName("Test Update User Profile Null or Blank Address - Update Failed")
+    @WithMockUser(username = "test@gmail.com")
+    void testUpdateUserProfile_InvalidAddress_Failed() throws Exception {
+        var localDate = LocalDate.now().minusYears(20);
+        var dob = Date.valueOf(localDate);
+        UpdateRequest updateRequest = UpdateRequest.builder()
+                .MSSV("12345678")
+                .hovaten("Nguyễn Thanh Phong")
+                .sdt("123456789")
+                .diachi(null)
+                .quequan("test")
+                .gioitinh("test")
+                .dob(dob)
+                .build();
+
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String content = objectMapper.writeValueAsString(updateRequest);
+
+        mockMvc.perform(put("/profile/my_profile/update")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("code").value(1011))
+                .andExpect(jsonPath("message").value("Địa chỉ không được bỏ trống"));
+    }
+
+    @Test
+    @DisplayName("Test Update User Profile Null or Blank Hometown - Update Failed")
+    @WithMockUser(username = "test@gmail.com")
+    void testUpdateUserProfile_InvalidHometown_Failed() throws Exception {
+        var localDate = LocalDate.now().minusYears(20);
+        var dob = Date.valueOf(localDate);
+        UpdateRequest updateRequest = UpdateRequest.builder()
+                .MSSV("12345678")
+                .hovaten("Nguyễn Thanh Phong")
+                .sdt("123456789")
+                .diachi("test")
+                .quequan(null)
+                .gioitinh("test")
+                .dob(dob)
+                .build();
+
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String content = objectMapper.writeValueAsString(updateRequest);
+
+        mockMvc.perform(put("/profile/my_profile/update")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("code").value(1012))
+                .andExpect(jsonPath("message").value("Quê quán không được bỏ trống"));
+    }
+
+    @Test
+    @DisplayName("Test Update User Profile Null or Blank Gender - Update Failed")
+    @WithMockUser(username = "test@gmail.com")
+    void testUpdateUserProfile_InvalidGender_Failed() throws Exception {
+        var localDate = LocalDate.now().minusYears(20);
+        var dob = Date.valueOf(localDate);
+        UpdateRequest updateRequest = UpdateRequest.builder()
+                .MSSV("12345678")
+                .hovaten("Nguyễn Thanh Phong")
+                .sdt("123456789")
+                .diachi("test")
+                .quequan("test")
+                .gioitinh(null)
+                .dob(dob)
+                .build();
+
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String content = objectMapper.writeValueAsString(updateRequest);
+
+        mockMvc.perform(put("/profile/my_profile/update")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("code").value(1010))
+                .andExpect(jsonPath("message").value("Giới tính không được bỏ trống"));
+    }
+
+    @Test
+    @DisplayName("Test Update User Profile Under 18 Dob - Update Failed")
+    @WithMockUser(username = "test@gmail.com")
+    void testUpdateUserProfile_InvalidDob_Failed() throws Exception {
+        var localDate = LocalDate.now().minusYears(1);
+        var dob = Date.valueOf(localDate);
+        UpdateRequest updateRequest = UpdateRequest.builder()
+                .MSSV("12345678")
+                .hovaten("Nguyễn Thanh Phong")
+                .sdt("123456789")
+                .diachi("test")
+                .quequan("test")
+                .gioitinh("test")
+                .dob(dob)
+                .build();
+
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String content = objectMapper.writeValueAsString(updateRequest);
+
+        mockMvc.perform(put("/profile/my_profile/update")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(content))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("code").value(1008))
+                .andExpect(jsonPath("message").value("Your age must be at least 18"));
+    }
+
     //Test for GET /profile/all_profiles
     @Test
     @DisplayName("Test Get All User Profiles With Admin Role - Get Success")
     @WithMockUser(username = "admin@gmail.com" , roles = {"ADMIN"})
     void testGetAllUserProfiles_AdminRole_Success() throws Exception {
-        var localDate = LocalDate.of(2025,12,31);
+        var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
 
         GetProfileRespond getProfileRespond = GetProfileRespond.builder()
@@ -232,7 +394,7 @@ public class UserProfileControllerTest {
     @DisplayName("Test Get All User Profiles With User Role - Forbidden Failed")
     @WithMockUser(username = "test@gmail.com")
     void testGetAllUserProfiles_UserRole_Failed() throws Exception {
-        var localDate = LocalDate.of(2025,12,31);
+        var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
 
         GetProfileRespond getProfileRespond = GetProfileRespond.builder()
@@ -260,7 +422,7 @@ public class UserProfileControllerTest {
     @DisplayName("Test Get All User Profiles With Expired Token - Unauthenticated Failed")
     @WithAnonymousUser
     void testGetAllUserProfiles_ExpiredToken_Failed() throws Exception {
-        var localDate = LocalDate.of(2025,12,31);
+        var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
 
         GetProfileRespond getProfileRespond = GetProfileRespond.builder()
@@ -289,7 +451,7 @@ public class UserProfileControllerTest {
     @DisplayName("Test Search User Profiles With Admin Role - Search Success")
     @WithMockUser(username = "admin@gmail.com" , roles = {"ADMIN"})
     void SearchUserProfiles_AdminRole_Success() throws Exception {
-        var localDate = LocalDate.of(2025,12,31);
+        var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
 
         GetProfileRespond getProfileRespond = GetProfileRespond.builder()
@@ -323,7 +485,7 @@ public class UserProfileControllerTest {
     @DisplayName("Test Search User Profiles With Expired Token - Unauthenticated Failed")
     @WithAnonymousUser
     void SearchUserProfiles_ExpiredToken_Failed() throws Exception {
-        var localDate = LocalDate.of(2025,12,31);
+        var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
 
         GetProfileRespond getProfileRespond = GetProfileRespond.builder()
