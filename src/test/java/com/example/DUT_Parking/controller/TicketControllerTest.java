@@ -8,6 +8,9 @@ import com.example.DUT_Parking.services.AdminServices;
 import com.example.DUT_Parking.services.RegisterService;
 import com.example.DUT_Parking.services.UserServices;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Link;
+import io.qameta.allure.TmsLink;
 import org.apiguardian.api.API;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DisplayName("Ticket Controller Test")
 public class TicketControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -56,9 +60,12 @@ public class TicketControllerTest {
     ObjectMapper objectMapper;
 
     //Test for POST services/ticket/create-ticket
+    @Feature("Create Ticket Type")
     @Test
+    @TmsLink("47")
     @DisplayName("Test Create Ticket With Admin Role - Create Success")
     @WithMockUser(username = "admin@gmail.com" , roles = {"ADMIN"})
+    @Link(name = "TK-01" , type = "task")
     void testCreateTicket_AdminRole_Success() throws Exception {
         var ticketName = "VE NGAY";
         var menhgia = 9999;
@@ -85,9 +92,12 @@ public class TicketControllerTest {
                 .andExpect(jsonPath("result.message").value("Ticket create success!"));
     }
 
+    @Feature("Create Ticket Type")
     @Test
+    @TmsLink("48")
     @DisplayName("Test Create Ticket With User Role - Forbidden Failed")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "TK-02" , type = "task")
     void testCreateTicket_UserRole_Failed() throws Exception {
         var ticketName = "VE NGAY";
         var menhgia = 9999;
@@ -115,9 +125,12 @@ public class TicketControllerTest {
                 .andExpect(jsonPath("message").value("You do not have permission"));
     }
 
+    @Feature("Create Ticket Type")
     @Test
+    @TmsLink("49")
     @DisplayName("Test Create Ticket Expired Token - Unauthenticated Failed")
     @WithAnonymousUser
+    @Link(name = "TK-03" , type = "task")
     void testCreateTicket_ExpiredToken_Failed() throws Exception {
         var ticketName = "VE NGAY";
         var menhgia = 9999;
@@ -146,9 +159,12 @@ public class TicketControllerTest {
     }
 
     //Test for GET /services/ticket/tickets-list
+    @Feature("Get Ticket Type")
     @Test
+    @TmsLink("50")
     @DisplayName("Test Get Ticket Type List With Admin Role - Get Success")
     @WithMockUser(username = "admin@gmail.com" , roles = {"ADMIN"})
+    @Link(name = "TK-04" , type = "task")
     void testGetTicketsList_AdminRole_Success() throws Exception {
         var ticketName = "VE NGAY";
         var menhgia = 9999;
@@ -171,9 +187,12 @@ public class TicketControllerTest {
                 .andExpect(jsonPath("$[0].menhgia").value(menhgia));
     }
 
+    @Feature("Get Ticket Type")
     @Test
+    @TmsLink("51")
     @DisplayName("Test Get Ticket Type List With User Role - Forbidden Failed")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "TK-05" , type = "task")
     void testGetTicketsList_UserRole_Failed() throws Exception {
         var ticketName = "VE NGAY";
         var menhgia = 9999;
@@ -195,9 +214,12 @@ public class TicketControllerTest {
                 .andExpect(jsonPath("message").value("You do not have permission"));
     }
 
+    @Feature("Get Ticket Type")
     @Test
+    @TmsLink("52")
     @DisplayName("Test Get Ticket Type List Expired Token - Unauthenticated Failed")
     @WithAnonymousUser
+    @Link(name = "TK-06" , type = "task")
     void testGetTicketsList_ExpiredToken_Failed() throws Exception {
         var ticketName = "VE NGAY";
         var menhgia = 9999;
@@ -220,9 +242,12 @@ public class TicketControllerTest {
     }
 
     //Test for DELETE /services/ticket/tickets-list/{ticket_name}
+    @Feature("Delete Ticket Type By Ticket Name")
     @Test
+    @TmsLink("53")
     @DisplayName("Test Delete Ticket Type List With Admin Role - Delete Success")
     @WithMockUser(username = "admin@gmail.com" , roles = {"ADMIN"})
+    @Link(name = "TK-07" , type = "task")
     void testDeleteTicketType_AdminRole_Success() throws Exception {
         var ticketId = "VE01";
 
@@ -234,9 +259,12 @@ public class TicketControllerTest {
                         .string(String.format("Ticket %s has been delete successfully", ticketId)));
     }
 
+    @Feature("Delete Ticket Type By Ticket Name")
     @Test
+    @TmsLink("54")
     @DisplayName("Test Delete Ticket Type List Expired Token - Unauthenticated Failed")
     @WithAnonymousUser
+    @Link(name = "TK-08" , type = "task")
     void testDeleteTicketType_ExpiredToken_Failed() throws Exception {
 
         Mockito.doNothing().when(adminServices).deleteTicket(any());
@@ -248,9 +276,12 @@ public class TicketControllerTest {
     }
 
     //Test for POST /services/ticket/buy-ticket
+    @Feature("Buy Ticket")
     @Test
+    @TmsLink("55")
     @DisplayName("Test Buy Ticket With Valid Token - Buy Success")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "TK-09" , type = "task")
     void testBuyTicket_ValidToken_Success() throws Exception {
         var ticketName = "VE NGAY";
 
@@ -281,9 +312,12 @@ public class TicketControllerTest {
                         .value(String.format("Mua thanh cong %s , vui long kiem tra Ticket List cua ban", ticketName)));
     }
 
+    @Feature("Buy Ticket")
     @Test
+    @TmsLink("56")
     @DisplayName("Test Buy Ticket With Expired Token - Unauthenticated Failed")
     @WithAnonymousUser
+    @Link(name = "TK-10" , type = "task")
     void testBuyTicket_ExpiredToken_Failed() throws Exception {
         var ticketName = "VE NGAY";
 
@@ -314,9 +348,12 @@ public class TicketControllerTest {
     }
 
     //Test for GET /services/ticket/my-tickets-list
+    @Feature("User Get Ticket Wallet")
     @Test
+    @TmsLink("57")
     @DisplayName("Test Get My Tickets List - Get Success")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "TK-11" , type = "task")
     void testGetMyTicketsList_Success() throws Exception {
         var ticketName = "VE NGAY";
         var menhgia = 9999;
@@ -352,9 +389,12 @@ public class TicketControllerTest {
                 .andExpect(jsonPath("$[0].qr_code").value(Base64.getEncoder().encodeToString(qrcode)));
     }
 
+    @Feature("User Get Ticket Wallet")
     @Test
+    @TmsLink("58")
     @DisplayName("Test Get My Tickets List Expired Token - Unauthenticated Failed")
     @WithAnonymousUser
+    @Link(name = "TK-12" , type = "task")
     void testGetMyTicketsList_ExpiredToken_Failed() throws Exception {
         var ticketName = "VE NGAY";
         var menhgia = 9999;
@@ -386,9 +426,12 @@ public class TicketControllerTest {
     }
 
     //Test for DELETE /services/ticket/my-tickets-list/{id}
+    @Feature("User Delete Ticket By Id")
     @Test
+    @TmsLink("59")
     @DisplayName("Test delete ticket only by User in User Ticket List - Delete Success")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "TK-13" , type = "task")
     void testDeleteTicketInUserTicketList_onlyByUser_Success() throws Exception {
         var id = 1L;
 
@@ -403,9 +446,12 @@ public class TicketControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Feature("User Delete Ticket By Id")
     @Test
+    @TmsLink("60")
     @DisplayName("Test delete ticket but expired token - Unauthenticated Failed")
     @WithAnonymousUser
+    @Link(name = "TK-14" , type = "task")
     void testDeleteTicketInUserTicketList_ExpiredToken_Failed() throws Exception {
         var id = 1L;
 
@@ -423,9 +469,12 @@ public class TicketControllerTest {
     }
 
     // Test for POST /services/ticket/my-tickets-list/enable-ticket/{id}
+    @Feature("Enable Ticket By Id")
     @Test
+    @TmsLink("61")
     @DisplayName("Test enable ticket with valid token - Enable Success")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "TK-15" , type = "task")
     void testEnableTicket_WithValidToken_EnableSuccess() throws Exception {
         EnableTicketRespond enableTicketRespond = EnableTicketRespond.builder()
                 .status(true)
@@ -451,9 +500,12 @@ public class TicketControllerTest {
                 .andExpect(jsonPath("result.ticketToken").value("abcxyz"));
     }
 
+    @Feature("Enable Ticket By Id")
     @Test
+    @TmsLink("62")
     @DisplayName("Test enable ticket with expired token - Unauthenticated Failed")
     @WithAnonymousUser
+    @Link(name = "TK-16" , type = "task")
     void testEnableTicket_WithExpiredToken_EnableFailed() throws Exception {
         EnableTicketRespond enableTicketRespond = EnableTicketRespond.builder()
                 .status(true)
@@ -479,9 +531,12 @@ public class TicketControllerTest {
     }
 
     // Test for GET /services/ticket/all-user-tickets
+    @Feature("Get All Sold Ticket")
     @Test
+    @TmsLink("63")
     @DisplayName("Test get all user tickets list with Admin role - Get Success")
     @WithMockUser(username = "admin@gmail.com",roles = {"ADMIN"})
+    @Link(name = "TK-17" , type = "task")
     void testGetAllUserTicketsList_AdminRole_Success() throws Exception {
         var expiryLocalDate = LocalDate.of(2025,12,31);
         Date expiryDate = Date.valueOf(expiryLocalDate);
@@ -517,9 +572,12 @@ public class TicketControllerTest {
                 .andExpect(jsonPath("$[0].menhgia").value(9999));
     }
 
+    @Feature("Get All Sold Ticket")
     @Test
+    @TmsLink("64")
     @DisplayName("Test get all user tickets list with User role - Forbidden Failed")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "TK-18" , type = "task")
     void testGetAllUserTicketsList_UserRole_Failed() throws Exception {
         var expiryLocalDate = LocalDate.of(2025,12,31);
         Date expiryDate = Date.valueOf(expiryLocalDate);
@@ -549,9 +607,12 @@ public class TicketControllerTest {
                 .andExpect(jsonPath("message").value("You do not have permission"));
     }
 
+    @Feature("Get All Sold Ticket")
     @Test
+    @TmsLink("65")
     @DisplayName("Test get all user tickets list expired token - Unauthenticated Failed")
     @WithAnonymousUser
+    @Link(name = "TK-19" , type = "task")
     void testGetAllUserTicketsList_ExpiredToken_Failed() throws Exception {
         var expiryLocalDate = LocalDate.of(2025,12,31);
         Date expiryDate = Date.valueOf(expiryLocalDate);
@@ -582,9 +643,12 @@ public class TicketControllerTest {
     }
 
     // Test for GET /services/ticket/all-user-tickets/{MSSV}
+    @Feature("Search Ticket Sold By MSSV")
     @Test
+    @TmsLink("66")
     @DisplayName("Test search user tickets list with Admin role - Search Success")
     @WithMockUser(username = "admin@gmail.com",roles = {"ADMIN"})
+    @Link(name = "TK-20" , type = "task")
     void testSearchUserTicketsList_AdminRole_Success() throws Exception {
         var expiryLocalDate = LocalDate.of(2025,12,31);
         Date expiryDate = Date.valueOf(expiryLocalDate);
@@ -626,9 +690,12 @@ public class TicketControllerTest {
                 .andExpect(jsonPath("$[0].menhgia").value(9999));
     }
 
+    @Feature("Search Ticket Sold By MSSV")
     @Test
+    @TmsLink("65")
     @DisplayName("Test get all user tickets list expired token - Unauthenticated Failed")
     @WithAnonymousUser
+    @Link(name = "TK-21" , type = "task")
     void testSearchUserTicketsList_ExpiredToken_Failed() throws Exception {
         var expiryLocalDate = LocalDate.of(2025,12,31);
         Date expiryDate = Date.valueOf(expiryLocalDate);
@@ -665,9 +732,12 @@ public class TicketControllerTest {
     }
 
     // Test for DELETE /services/ticket/all-user-tickets/{id}
+    @Feature("Delete Ticket Sold By Id")
     @Test
+    @TmsLink("67")
     @DisplayName("Test delete user ticket only by Admin - Delete Success")
     @WithMockUser(username = "admin@gmail.com",roles = {"ADMIN"})
+    @Link(name = "TK-22" , type = "task")
     void testDeleteUserTicket_onlyByAdmin_Success() throws Exception {
         var id = 1L;
 
@@ -682,9 +752,12 @@ public class TicketControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Feature("Delete Ticket Sold By Id")
     @Test
+    @TmsLink("68")
     @DisplayName("Test delete user ticket expired token - Unauthenticated Failed")
     @WithAnonymousUser
+    @Link(name = "TK-23" , type = "task")
     void testDeleteUserTicket_ExpiredToken_Failed() throws Exception {
         var id = 1L;
 

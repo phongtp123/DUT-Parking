@@ -5,6 +5,9 @@ import com.example.DUT_Parking.respond.APIRespond;
 import com.example.DUT_Parking.respond.RechargeRespond;
 import com.example.DUT_Parking.services.UserServices;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Link;
+import io.qameta.allure.TmsLink;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DisplayName("Recharge Controller Test")
 public class RechargeControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -36,9 +40,12 @@ public class RechargeControllerTest {
     ObjectMapper objectMapper;
 
     //Test for POST /services/recharge
+    @Feature("Recharge")
     @Test
+    @TmsLink("45")
     @DisplayName("All Clear - Recharge Success")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "RECHARGE-01" , type = "task")
     void testRecharge_Success() throws Exception {
         var menhgia = 100000;
 
@@ -69,9 +76,12 @@ public class RechargeControllerTest {
                         .value(String.format("Nạp thành công %s đồng",menhgia)));
     }
 
+    @Feature("Recharge")
     @Test
+    @TmsLink("46")
     @DisplayName("Test Recharge With Token Expired - Unauthenticated Failed")
     @WithAnonymousUser
+    @Link(name = "RECHARGE-01" , type = "task")
     void testRecharge_Failed() throws Exception {
         var menhgia = 100000;
 

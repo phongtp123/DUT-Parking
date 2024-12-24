@@ -1,6 +1,7 @@
 package com.example.DUT_Parking.services;
 
 import com.example.DUT_Parking.DTO.AuthenticationRequest;
+import com.example.DUT_Parking.DTO.ForgetPasswordRequest;
 import com.example.DUT_Parking.DTO.IntrospectLoginToken;
 import com.example.DUT_Parking.DTO.LogoutRequest;
 import com.example.DUT_Parking.entity.UsersProfile;
@@ -9,6 +10,7 @@ import com.example.DUT_Parking.respond.GetLoginUsers;
 import com.example.DUT_Parking.respond.GetLogoutUsers;
 import com.example.DUT_Parking.respond.IntrospectRespond;
 import com.nimbusds.jose.JOSEException;
+import jakarta.mail.MessagingException;
 
 import java.text.ParseException;
 import java.util.List;

@@ -1,6 +1,7 @@
 package com.example.DUT_Parking.services.impl;
 
 import com.example.DUT_Parking.DTO.AuthenticationRequest;
+import com.example.DUT_Parking.DTO.ForgetPasswordRequest;
 import com.example.DUT_Parking.DTO.IntrospectLoginToken;
 import com.example.DUT_Parking.DTO.LogoutRequest;
 import com.example.DUT_Parking.entity.LogoutUsers;
@@ -21,15 +22,21 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -49,6 +56,7 @@ public class AuthenticationImpl implements AuthenticationService {
         LoginUserRepo loginUserRepo;
         LogoutUserRepo logoutUserRepo;
         com.example.DUT_Parking.configuration.JWTParser jwtParser;
+//        JavaMailSender mailSender;
 
         @NonFinal
         public static final String signer_key = "4B8SWV0opYWRgxeKoKost+CvEfqKhCPV0G1SFgU6V1vLOLbBWo5hE1JhpQUV7gWL";
@@ -195,5 +203,64 @@ public class AuthenticationImpl implements AuthenticationService {
                         return getLogoutUsers;
                 }).collect(Collectors.toList());
         }
+
+//        public void sendPasswordEmail(String email) throws MessagingException {
+//                try {
+//                        MimeMessage mimeMessage = mailSender.createMimeMessage();
+//                        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+//                        mimeMessageHelper.setFrom("phongboy1709@gmail.com" , "");
+//                        mimeMessageHelper.setTo(email);
+//                        mimeMessageHelper.setSubject("Reset Password Request");
+//
+//                        String resetLink = String.format("http://localhost:8080/auth/reset-password?email=%s", URLEncoder.encode(email, StandardCharsets.UTF_8));
+//                        String emailContent = String.format("""
+//                <div>
+//                    <p>Hi,</p>
+//                    <p>You requested a password reset. Click the link below to reset your password:</p>
+//                    <a href="%s" target="_blank">Reset Password</a>
+//                    <p>If you did not request this, please ignore this email.</p>
+//                </div>
+//                """, resetLink);
+//
+//                        mimeMessageHelper.setText(emailContent, true);
+//                        mailSender.send(mimeMessage);
+//                } catch (MessagingException e) {
+//                        throw new AppException(ErrorCode.EMAIL_SENDING_FAILED);
+//                }
+//        }
+//
+//        private boolean isValidEmail(String email) {
+//                String emailRegex = "^[a-zA-Z0-9]+@gmail\\.com$";
+//                return email != null && email.matches(emailRegex);
+//        }
+//
+//        public String forgetPassword(ForgetPasswordRequest request) {
+//                if (!isValidEmail(request.getEmail())) {
+//                        throw new AppException(ErrorCode.EMAIL_INVALID);
+//                }
+//
+//                var registeredUser = registeredUserRepo.findByEmail(request.getEmail().trim());
+//                if (registeredUser == null) {
+//                        throw new AppException(ErrorCode.USER_NOT_EXISTED);
+//                }
+//
+//                try {
+//                        sendPasswordEmail(request.getEmail().trim());
+//                } catch (MessagingException e) {
+//                        throw new AppException(ErrorCode.EMAIL_SENDING_FAILED);
+//                }
+//
+//                return String.format("The request to reset your password has been sent to %s. Please check your email to set your new password.", request.getEmail().trim());
+//        }
+//
+//        public String resetPassword(String email , String newPassword) {
+//                var registeredUser = registeredUserRepo.findByEmail(email);
+//                if (registeredUser == null) {
+//                        throw new AppException(ErrorCode.USER_NOT_EXISTED);
+//                }
+//                registeredUser.setPassword(newPassword);
+//                registeredUserRepo.save(registeredUser);
+//                return "Reset password successful";
+//        }
 
 }

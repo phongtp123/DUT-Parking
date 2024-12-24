@@ -6,6 +6,9 @@ import com.example.DUT_Parking.services.AdminServices;
 import com.example.DUT_Parking.services.UserServices;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Link;
+import io.qameta.allure.TmsLink;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DisplayName("User Profile Controller Test")
 public class UserProfileControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -46,9 +50,12 @@ public class UserProfileControllerTest {
     private ObjectMapper objectMapper;
 
     //Test for GET /profile/my_profile
+    @Feature("Get My Profile")
     @Test
+    @TmsLink("28")
     @DisplayName("Test Get User Profile With Valid Token - Get Success")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "PROFILE-01" , type = "task")
     void testGetUserProfile_ValidToken_Success() throws Exception {
         var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
@@ -81,9 +88,12 @@ public class UserProfileControllerTest {
                 .andExpect(jsonPath("result.dob").value(dob.toString()));
     }
 
+    @Feature("Get My Profile")
     @Test
+    @TmsLink("29")
     @DisplayName("Test Get User Profile With Expired Token - Get Failed")
     @WithAnonymousUser
+    @Link(name = "PROFILE-02" , type = "task")
     void testGetUserProfile_ExpiredToken_Failed() throws Exception {
         var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
@@ -111,9 +121,12 @@ public class UserProfileControllerTest {
     }
 
     //Test for PUT /profile/my_profile/update
+    @Feature("Update Profile")
     @Test
+    @TmsLink("30")
     @DisplayName("Test Update User Profile With Valid Token - Update Success")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "PROFILE-03" , type = "task")
     void testUpdateUserProfile_ValidToken_Success() throws Exception {
         var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
@@ -149,9 +162,12 @@ public class UserProfileControllerTest {
                 .andExpect(jsonPath("result.message").value("Update user profile successfully"));
     }
 
+    @Feature("Update Profile")
     @Test
+    @TmsLink("31")
     @DisplayName("Test Update User Profile With Expired Token - Update Failed")
     @WithAnonymousUser
+    @Link(name = "PROFILE-04" , type = "task")
     void testUpdateUserProfile_ExpiredToken_Failed() throws Exception {
         var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
@@ -187,9 +203,12 @@ public class UserProfileControllerTest {
                 .andExpect(jsonPath("message").value("Unauthenticated"));
     }
 
+    @Feature("Update Profile")
     @Test
+    @TmsLink("32")
     @DisplayName("Test Update User Profile Null or Blank Name - Update Failed")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "PROFILE-05" , type = "task")
     void testUpdateUserProfile_InvalidName_Failed() throws Exception {
         var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
@@ -215,9 +234,12 @@ public class UserProfileControllerTest {
                 .andExpect(jsonPath("message").value("Họ và tên không được bỏ trống"));
     }
 
+    @Feature("Update Profile")
     @Test
+    @TmsLink("33")
     @DisplayName("Test Update User Profile Null or Blank Phone Number - Update Failed")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "PROFILE-06" , type = "task")
     void testUpdateUserProfile_InvalidSDT_Failed() throws Exception {
         var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
@@ -243,9 +265,12 @@ public class UserProfileControllerTest {
                 .andExpect(jsonPath("message").value("Số điện thoại không được bỏ trống"));
     }
 
+    @Feature("Update Profile")
     @Test
+    @TmsLink("34")
     @DisplayName("Test Update User Profile Null or Blank Address - Update Failed")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "PROFILE-07" , type = "task")
     void testUpdateUserProfile_InvalidAddress_Failed() throws Exception {
         var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
@@ -271,9 +296,12 @@ public class UserProfileControllerTest {
                 .andExpect(jsonPath("message").value("Địa chỉ không được bỏ trống"));
     }
 
+    @Feature("Update Profile")
     @Test
+    @TmsLink("35")
     @DisplayName("Test Update User Profile Null or Blank Hometown - Update Failed")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "PROFILE-08" , type = "task")
     void testUpdateUserProfile_InvalidHometown_Failed() throws Exception {
         var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
@@ -299,9 +327,12 @@ public class UserProfileControllerTest {
                 .andExpect(jsonPath("message").value("Quê quán không được bỏ trống"));
     }
 
+    @Feature("Update Profile")
     @Test
+    @TmsLink("36")
     @DisplayName("Test Update User Profile Null or Blank Gender - Update Failed")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "PROFILE-09" , type = "task")
     void testUpdateUserProfile_InvalidGender_Failed() throws Exception {
         var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
@@ -327,9 +358,12 @@ public class UserProfileControllerTest {
                 .andExpect(jsonPath("message").value("Giới tính không được bỏ trống"));
     }
 
+    @Feature("Update Profile")
     @Test
+    @TmsLink("37")
     @DisplayName("Test Update User Profile Under 18 Dob - Update Failed")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "PROFILE-10" , type = "task")
     void testUpdateUserProfile_InvalidDob_Failed() throws Exception {
         var localDate = LocalDate.now().minusYears(1);
         var dob = Date.valueOf(localDate);
@@ -356,9 +390,12 @@ public class UserProfileControllerTest {
     }
 
     //Test for GET /profile/all_profiles
+    @Feature("Get All Profile")
     @Test
+    @TmsLink("38")
     @DisplayName("Test Get All User Profiles With Admin Role - Get Success")
     @WithMockUser(username = "admin@gmail.com" , roles = {"ADMIN"})
+    @Link(name = "PROFILE-11" , type = "task")
     void testGetAllUserProfiles_AdminRole_Success() throws Exception {
         var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
@@ -390,9 +427,12 @@ public class UserProfileControllerTest {
                 .andExpect(jsonPath("$[0].dob").value(dob.toString()));
     }
 
+    @Feature("Get All Profile")
     @Test
+    @TmsLink("39")
     @DisplayName("Test Get All User Profiles With User Role - Forbidden Failed")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "PROFILE-12" , type = "task")
     void testGetAllUserProfiles_UserRole_Failed() throws Exception {
         var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
@@ -418,9 +458,12 @@ public class UserProfileControllerTest {
                 .andExpect(jsonPath("message").value("You do not have permission"));
     }
 
+    @Feature("Get All Profile")
     @Test
+    @TmsLink("40")
     @DisplayName("Test Get All User Profiles With Expired Token - Unauthenticated Failed")
     @WithAnonymousUser
+    @Link(name = "PROFILE-13" , type = "task")
     void testGetAllUserProfiles_ExpiredToken_Failed() throws Exception {
         var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
@@ -447,9 +490,12 @@ public class UserProfileControllerTest {
     }
 
     //Test for GET /profile/all_profiles/{MSSV}
+    @Feature("Search User Profile By MSSV")
     @Test
+    @TmsLink("41")
     @DisplayName("Test Search User Profiles With Admin Role - Search Success")
     @WithMockUser(username = "admin@gmail.com" , roles = {"ADMIN"})
+    @Link(name = "PROFILE-14" , type = "task")
     void SearchUserProfiles_AdminRole_Success() throws Exception {
         var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
@@ -481,9 +527,12 @@ public class UserProfileControllerTest {
                 .andExpect(jsonPath("$[0].dob").value(dob.toString()));
     }
 
+    @Feature("Search User Profile By MSSV")
     @Test
+    @TmsLink("42")
     @DisplayName("Test Search User Profiles With Expired Token - Unauthenticated Failed")
     @WithAnonymousUser
+    @Link(name = "PROFILE-15" , type = "task")
     void SearchUserProfiles_ExpiredToken_Failed() throws Exception {
         var localDate = LocalDate.now().minusYears(20);
         var dob = Date.valueOf(localDate);
@@ -510,9 +559,12 @@ public class UserProfileControllerTest {
     }
 
     //Test for DELETE /profile/all_profiles/{MSSV}
+    @Feature("Delete User Profile By MSSV")
     @Test
+    @TmsLink("43")
     @DisplayName("Test Delete User Profiles With Admin Role - Delete Success")
     @WithMockUser(username = "admin@gmail.com" , roles = {"ADMIN"})
+    @Link(name = "PROFILE-16" , type = "task")
     void DeleteUserProfiles_AdminRole_Success() throws Exception {
 
         Mockito.doNothing().when(adminServices).deleteUserProfile(any());
@@ -522,9 +574,12 @@ public class UserProfileControllerTest {
                 .andExpect(content().string("User profile has been deleted"));
     }
 
+    @Feature("Delete User Profile By MSSV")
     @Test
+    @TmsLink("44")
     @DisplayName("Test Delete User Profiles With Expired Token - Unauthenticated Failed")
     @WithAnonymousUser
+    @Link(name = "PROFILE-17" , type = "task")
     void DeleteUserProfiles_Expired_Token_Failed() throws Exception {
 
         Mockito.doNothing().when(adminServices).deleteUserProfile(any());

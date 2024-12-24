@@ -7,6 +7,9 @@ import com.example.DUT_Parking.services.AdminServices;
 import com.example.DUT_Parking.services.PassMonitorService;
 import com.example.DUT_Parking.services.RegisterService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Link;
+import io.qameta.allure.TmsLink;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DisplayName("Pass Monitor Controller Test")
 public class PassMonitorControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -48,9 +52,12 @@ public class PassMonitorControllerTest {
     private PassMonitorService passMonitorService;
 
     // Test for GET /monitor/pass-monitor
+    @Feature("Open Pass Monitor")
     @Test
+    @TmsLink("69")
     @DisplayName("Test open pass monitor with Admin role - Open Success")
     @WithMockUser(username = "admin@gmail.com" , roles = {"ADMIN"})
+    @Link(name = "PM-01" , type = "task")
     void testOpenPassMonitor_WithAdminRole_Success() throws Exception {
         GetAllPassDataRespond getAllPassDataRespond = GetAllPassDataRespond.builder()
                 .id(1L)
@@ -73,9 +80,12 @@ public class PassMonitorControllerTest {
                 .andExpect(jsonPath("$[0].decision").value("PASS"));
     }
 
+    @Feature("Open Pass Monitor")
     @Test
+    @TmsLink("70")
     @DisplayName("Test open pass monitor with User role - Forbidden Failed")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "PM-02" , type = "task")
     void testOpenPassMonitor_WithUserRole_Failed() throws Exception {
         GetAllPassDataRespond getAllPassDataRespond = GetAllPassDataRespond.builder()
                 .id(1L)
@@ -95,9 +105,12 @@ public class PassMonitorControllerTest {
                 .andExpect(jsonPath("message").value("You do not have permission"));
     }
 
+    @Feature("Open Pass Monitor")
     @Test
+    @TmsLink("71")
     @DisplayName("Test open pass monitor expired token - Unauthenticated Failed")
     @WithAnonymousUser
+    @Link(name = "PM-03" , type = "task")
     void testOpenPassMonitor_ExpiredToken_Failed() throws Exception {
         GetAllPassDataRespond getAllPassDataRespond = GetAllPassDataRespond.builder()
                 .id(1L)
@@ -118,9 +131,12 @@ public class PassMonitorControllerTest {
     }
 
     //Test DELETE /monitor/pass-monitor/reset
+    @Feature("Reset Pass Monitor")
     @Test
+    @TmsLink("72")
     @DisplayName("Test delete all data in pass monitor - Reset Success")
     @WithMockUser(username = "admin@gmail.com" , roles = {"ADMIN"})
+    @Link(name = "PM-04" , type = "task")
     void testReset_Success() throws Exception {
 
         Mockito.doNothing().when(adminServices).deleteAllPassData();
@@ -129,9 +145,12 @@ public class PassMonitorControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Feature("Reset Pass Monitor")
     @Test
+    @TmsLink("73")
     @DisplayName("Test delete all data expired token - Unauthenticated Failed")
     @WithAnonymousUser
+    @Link(name = "PM-05" , type = "task")
     void testReset_ExpiredToken_Failed() throws Exception {
 
         Mockito.doNothing().when(adminServices).deleteAllPassData();

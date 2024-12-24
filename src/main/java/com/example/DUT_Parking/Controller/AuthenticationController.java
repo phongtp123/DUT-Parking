@@ -1,15 +1,18 @@
 package com.example.DUT_Parking.Controller;
 
 import com.example.DUT_Parking.DTO.AuthenticationRequest;
+import com.example.DUT_Parking.DTO.ForgetPasswordRequest;
 import com.example.DUT_Parking.DTO.IntrospectLoginToken;
 import com.example.DUT_Parking.DTO.LogoutRequest;
 import com.example.DUT_Parking.respond.*;
 import com.example.DUT_Parking.services.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 

@@ -7,6 +7,9 @@ import com.example.DUT_Parking.respond.*;
 import com.example.DUT_Parking.services.AuthenticationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Link;
+import io.qameta.allure.TmsLink;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -31,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DisplayName("Authentication Controller Test")
 public class AuthenticationControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -42,8 +46,11 @@ public class AuthenticationControllerTest {
     private ObjectMapper objectMapper;
 
     //Test for POST /auth/login
+    @Feature("Login")
     @Test
+    @TmsLink("1")
     @DisplayName("All Clear - Login Successful")
+    @Link(name = "AUTH-01" , type = "task")
     void login_Success() throws Exception {
         AuthenticationRequest authenticationRequest = AuthenticationRequest.builder()
                                                             .email("test@gmail.com")
@@ -70,8 +77,11 @@ public class AuthenticationControllerTest {
                 .andExpect(jsonPath("result.token").value("abcxyz"));
     }
 
+    @Feature("Login")
     @Test
+    @TmsLink("2")
     @DisplayName("Null Email Input - Login Failed")
+    @Link(name = "AUTH-02" , type = "task")
     void loginWithNullEmail_Failed() throws Exception {
         AuthenticationRequest authenticationRequest = AuthenticationRequest.builder()
                 .email(null)
@@ -91,8 +101,11 @@ public class AuthenticationControllerTest {
                 );
     }
 
+    @Feature("Login")
     @Test
+    @TmsLink("3")
     @DisplayName("Null Password Input - Login Failed")
+    @Link(name = "AUTH-03" , type = "task")
     void loginWithNullPassword_Failed() throws Exception {
         AuthenticationRequest authenticationRequest = AuthenticationRequest.builder()
                 .email("test@gmail.com")
@@ -112,8 +125,11 @@ public class AuthenticationControllerTest {
                 );
     }
 
+    @Feature("Login")
     @Test
+    @TmsLink("4")
     @DisplayName("Invalid Email Input - Login Failed")
+    @Link(name = "AUTH-04" , type = "task")
     void loginWithInvalidEmail_Failed() throws Exception {
         AuthenticationRequest authenticationRequest = AuthenticationRequest.builder()
                 .email("test<3@gmail.com")
@@ -134,9 +150,12 @@ public class AuthenticationControllerTest {
     }
 
     //Test for GET /auth/login-users
+    @Feature("Get Login User")
     @Test
+    @TmsLink("5")
     @DisplayName("With Admin Role - Get All Login Users Success")
     @WithMockUser(username = "admin@gmail.com" , roles = {"ADMIN"})
+    @Link(name = "AUTH-05" , type = "task")
     void getAllLoginUsers_WithAdminRole_Success() throws Exception {
         GetLoginUsers getLoginUsers = GetLoginUsers.builder()
                 .id(1L)
@@ -151,9 +170,12 @@ public class AuthenticationControllerTest {
                 .andExpect(jsonPath("$[0].email").value("test@gmail.com"));
     }
 
+    @Feature("Get Login User")
     @Test
+    @TmsLink("6")
     @DisplayName("With User Role - Get All Login Users Forbidden Failed")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "AUTH-06" , type = "task")
     void getAllLoginUsers_WithUserRole_Failed() throws Exception {
         GetLoginUsers getLoginUsers = GetLoginUsers.builder()
                 .id(1L)
@@ -169,9 +191,12 @@ public class AuthenticationControllerTest {
                 .andExpect(jsonPath("message").value("You do not have permission"));
     }
 
+    @Feature("Get Login User")
     @Test
+    @TmsLink("7")
     @DisplayName("Anonymous Account or Expired Token - Get All Login Users Unauthorized Failed")
     @WithAnonymousUser
+    @Link(name = "AUTH-07" , type = "task")
     void getAllLoginUsers_WithAnonymous_Failed() throws Exception {
         GetLoginUsers getLoginUsers = GetLoginUsers.builder()
                 .id(1L)
@@ -188,8 +213,11 @@ public class AuthenticationControllerTest {
     }
 
     //Test for POST /auth/introspect
+    @Feature("Introspect")
     @Test
+    @TmsLink("8")
     @DisplayName("Introspect Valid Token - Success")
+    @Link(name = "AUTH-08" , type = "task")
     void introspectValidToken_Success() throws Exception {
         IntrospectLoginToken introspectLoginToken = IntrospectLoginToken.builder()
                 .token("abcxyz")
@@ -215,8 +243,11 @@ public class AuthenticationControllerTest {
                 .andExpect(jsonPath("result.valid_expired").value(true));
     }
 
+    @Feature("Introspect")
     @Test
+    @TmsLink("9")
     @DisplayName("Introspect InValid Token - Failed")
+    @Link(name = "AUTH-09" , type = "task")
     void introspectInValidToken_Success() throws Exception {
         IntrospectLoginToken introspectLoginToken = IntrospectLoginToken.builder()
                 .token("abcxyz")
@@ -243,8 +274,11 @@ public class AuthenticationControllerTest {
     }
 
     //Test for POST /auth/logout
+    @Feature("Logout")
     @Test
+    @TmsLink("10")
     @DisplayName("All Clear - Logout Success")
+    @Link(name = "AUTH-10" , type = "task")
     void logout_Success() throws Exception {
         LogoutRequest logoutRequest = LogoutRequest.builder()
                 .token("abcxyz")
@@ -262,9 +296,12 @@ public class AuthenticationControllerTest {
     }
 
     //Test for GET /auth/logout-users
+    @Feature("Get Logout User")
     @Test
+    @TmsLink("11")
     @DisplayName("With Admin Role - Get All Logout Users Success")
     @WithMockUser(username = "admin@gmail.com" , roles = {"ADMIN"})
+    @Link(name = "AUTH-11" , type = "task")
     void getAllLogoutUsers_WithAdminRole_Success() throws Exception {
         var localDate = LocalDate.of(2025,12,31);
         var expiryDate = Date.valueOf(localDate);
@@ -289,9 +326,12 @@ public class AuthenticationControllerTest {
                 .andExpect(jsonPath("$[0].expiryDate").value(expiryDate.toString()));
     }
 
+    @Feature("Get Logout User")
     @Test
+    @TmsLink("12")
     @DisplayName("With User Role - Get All Logout Users Forbidden Failed")
     @WithMockUser(username = "test@gmail.com")
+    @Link(name = "AUTH-12" , type = "task")
     void getAllLogoutUsers_WithUserRole_Failed() throws Exception {
         var localDate = LocalDate.of(2025,12,31);
         var expiryDate = Date.valueOf(localDate);
@@ -315,9 +355,12 @@ public class AuthenticationControllerTest {
                 .andExpect(jsonPath("message").value("You do not have permission"));
     }
 
+    @Feature("Get Logout User")
     @Test
+    @TmsLink("13")
     @DisplayName("Anonymous Account or Expired Token - Get All Logout Users Unauthorized Failed")
     @WithAnonymousUser
+    @Link(name = "AUTH-13" , type = "task")
     void getAllLogoutUsers_WithAnonymous_Failed() throws Exception {
         var localDate = LocalDate.of(2025,12,31);
         var expiryDate = Date.valueOf(localDate);

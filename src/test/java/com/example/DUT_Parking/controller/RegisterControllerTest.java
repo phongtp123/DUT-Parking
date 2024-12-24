@@ -4,6 +4,9 @@ import com.example.DUT_Parking.DTO.RegisterRequest;
 import com.example.DUT_Parking.respond.GetRegisteredUsers;
 import com.example.DUT_Parking.services.RegisterService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Link;
+import io.qameta.allure.TmsLink;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -28,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DisplayName("Register Controller Test")
 public class RegisterControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -48,8 +52,11 @@ public class RegisterControllerTest {
     private ObjectMapper objectMapper; // For converting objects to JSON
 
     // Test for POST /auth/register
+    @Feature("Register")
     @Test
+    @TmsLink("14")
     @DisplayName("Test Register - Successful Registration")
+    @Link(name = "AUTH-14" , type = "task")
     void register_Success() throws Exception {
         // Mock service behavior
         objectMapper = new ObjectMapper();
@@ -65,8 +72,11 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("result.register_status").value(true));
     }
 
+    @Feature("Register")
     @Test
+    @TmsLink("15")
     @DisplayName("Test Register - Missing Email Input")
+    @Link(name = "AUTH-15" , type = "task")
     void register_InvalidInput_MissingEmail() throws Exception {
         // Invalid request (missing email fields)
         registerRequest.setEmail(null);
@@ -81,8 +91,11 @@ public class RegisterControllerTest {
                         .value("Email is invalid , the format of a valid email is :abcd1234@gmail.com "));
     }
 
+    @Feature("Register")
     @Test
+    @TmsLink("16")
     @DisplayName("Test Register - Missing Password Input")
+    @Link(name = "AUTH-16" , type = "task")
     void register_InvalidInput_MissingPassword() throws Exception {
         // Invalid request (missing password fields)
         registerRequest.setPassword(null);
@@ -98,8 +111,11 @@ public class RegisterControllerTest {
                         .value("Password must be at least 6 characters"));
     }
 
+    @Feature("Register")
     @Test
+    @TmsLink("17")
     @DisplayName("Test Register - Password Invalid Input")
+    @Link(name = "AUTH-17" , type = "task")
     void register_InvalidInput_InvalidPassword() throws Exception {
         // Invalid request (invalid password fields)
         registerRequest.setPassword("test");
@@ -114,8 +130,11 @@ public class RegisterControllerTest {
                         .value("Password must be at least 6 characters"));
     }
 
+    @Feature("Register")
     @Test
+    @TmsLink("18")
     @DisplayName("Test Register - Email Invalid Input")
+    @Link(name = "AUTH-18" , type = "task")
     void register_InvalidInput_InvalidEmail() throws Exception {
         // Invalid request (invalid password fields)
         registerRequest.setEmail("helo<3@gmail.com");
@@ -131,9 +150,12 @@ public class RegisterControllerTest {
     }
 
     // Test for GET /auth/registered_users/{email}
+    @Feature("Search Register User By Email")
     @Test
     @WithMockUser(username = "admin@gmail.com", password = "admin", roles = {"ADMIN"}) // Mô phỏng ADMIN
+    @TmsLink("19")
     @DisplayName("Test Search Register User With Admin Role - Success")
+    @Link(name = "AUTH-19" , type = "task")
     public void testSearchRegisteredUser_AsAdmin_Success() throws Exception {
         // Mô phỏng dữ liệu trả về từ service
         GetRegisteredUsers mockUser = new GetRegisteredUsers();
@@ -153,9 +175,12 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("result.password").value("12345678"));
     }
 
+    @Feature("Search Register User By Email")
     @Test
     @WithAnonymousUser()
+    @TmsLink("20")
     @DisplayName("Test Search Register User Without Token or Token has been expired - Failed")
+    @Link(name = "AUTH-20" , type = "task")
     public void testSearchRegisteredUser_AsAnonymous_Failed() throws Exception {
         // Mô phỏng dữ liệu trả về từ service
         GetRegisteredUsers mockUser = new GetRegisteredUsers();
@@ -173,9 +198,12 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("message").value("Unauthenticated"));
     }
 
+    @Feature("Search Register User By Email")
     @Test
     @WithMockUser(username = "test@gmail.com")
+    @TmsLink("21")
     @DisplayName("Test Search Register User With User Role - Failed")
+    @Link(name = "AUTH-21" , type = "task")
     public void testSearchRegisteredUser_AsUser_Failed() throws Exception {
         // Mô phỏng dữ liệu trả về từ service
         GetRegisteredUsers mockUser = new GetRegisteredUsers();
@@ -194,9 +222,12 @@ public class RegisterControllerTest {
     }
 
     // Test for GET /auth/registered_users
+    @Feature("Get All Register User")
     @Test
     @WithMockUser(username = "admin@gmail.com" , roles = {"ADMIN"})
+    @TmsLink("22")
     @DisplayName("Test Get All Register User With Admin Role - Success")
+    @Link(name = "AUTH-22" , type = "task")
     public void testGetAllRegisteredUser_AsAdmin_Success() throws Exception {
         // Mô phỏng dữ liệu trả về từ service
         GetRegisteredUsers mockUser = new GetRegisteredUsers();
@@ -216,9 +247,12 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("$[0].password").value("12345678"));
     }
 
+    @Feature("Get All Register User")
     @Test
     @WithMockUser(username = "test@gmail.com")
+    @TmsLink("23")
     @DisplayName("Test Get All Register User With User Role - Success")
+    @Link(name = "AUTH-23" , type = "task")
     public void testGetAllRegisteredUser_AsUser_Failed() throws Exception {
         // Mô phỏng dữ liệu trả về từ service
         GetRegisteredUsers mockUser = new GetRegisteredUsers();
@@ -238,9 +272,12 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("message").value("You do not have permission"));
     }
 
+    @Feature("Get All Register User")
     @Test
     @WithAnonymousUser
+    @TmsLink("24")
     @DisplayName("Test Get All Register User With Anonymous Account - Success")
+    @Link(name = "AUTH-24" , type = "task")
     public void testGetAllRegisteredUser_AsAnonymous_Failed() throws Exception {
         // Mô phỏng dữ liệu trả về từ service
         GetRegisteredUsers mockUser = new GetRegisteredUsers();
@@ -261,9 +298,12 @@ public class RegisterControllerTest {
     }
 
     // Test for DELETE /auth/registered_users/{id}
+    @Feature("Delete Register User By Id")
     @Test
     @WithMockUser(username = "admin@gmail.com" ,password = "admin", roles = {"ADMIN"})
+    @TmsLink("25")
     @DisplayName("Test Delete Register User With Admin Role - Success")
+    @Link(name = "AUTH-25" , type = "task")
     public void testDeleteRegisteredUser_AsAdmin_Success() throws Exception {
         // Mô phỏng dữ liệu trả về từ service
 
@@ -278,9 +318,12 @@ public class RegisterControllerTest {
                 .andExpect(content().string(respond));
     }
 
+    @Feature("Delete Register User By Id")
     @Test
     @WithMockUser(username = "test@gmail.com")
+    @TmsLink("26")
     @DisplayName("Test Delete Register User With User Role - Failed")
+    @Link(name = "AUTH-26" , type = "task")
     public void testDeleteRegisteredUser_AsUser_Failed() throws Exception {
         // Mô phỏng dữ liệu trả về từ service
 
@@ -296,9 +339,12 @@ public class RegisterControllerTest {
                 .andExpect(jsonPath("message").value("You do not have permission"));
     }
 
+    @Feature("Delete Register User By Id")
     @Test
     @WithAnonymousUser
+    @TmsLink("27")
     @DisplayName("Test Delete Register User With Anonymous Account - Failed")
+    @Link(name = "AUTH-27" , type = "task")
     public void testDeleteRegisteredUser_AsAnonymous_Failed() throws Exception {
         // Mô phỏng dữ liệu trả về từ service
 
