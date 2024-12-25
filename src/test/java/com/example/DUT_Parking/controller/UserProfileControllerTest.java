@@ -557,37 +557,4 @@ public class UserProfileControllerTest {
                 .andExpect(jsonPath("code").value(1006))
                 .andExpect(jsonPath("message").value("Unauthenticated"));
     }
-
-    //Test for DELETE /profile/all_profiles/{MSSV}
-    @Feature("Delete User Profile By MSSV")
-    @Test
-    @TmsLink("43")
-    @DisplayName("Test Delete User Profiles With Admin Role - Delete Success")
-    @WithMockUser(username = "admin@gmail.com" , roles = {"ADMIN"})
-    @Link(name = "PROFILE-16" , type = "task")
-    void DeleteUserProfiles_AdminRole_Success() throws Exception {
-
-        Mockito.doNothing().when(adminServices).deleteUserProfile(any());
-
-        mockMvc.perform(delete("/profile/all_profiles/12345678"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("User profile has been deleted"));
-    }
-
-    @Feature("Delete User Profile By MSSV")
-    @Test
-    @TmsLink("44")
-    @DisplayName("Test Delete User Profiles With Expired Token - Unauthenticated Failed")
-    @WithAnonymousUser
-    @Link(name = "PROFILE-17" , type = "task")
-    void DeleteUserProfiles_Expired_Token_Failed() throws Exception {
-
-        Mockito.doNothing().when(adminServices).deleteUserProfile(any());
-
-        mockMvc.perform(delete("/profile/all_profiles/12345678"))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("code").value(1006))
-                .andExpect(jsonPath("message").value("Unauthenticated"));
-    }
-
 }

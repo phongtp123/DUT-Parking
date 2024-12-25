@@ -64,11 +64,6 @@ public class PassMonitorImpl implements PassMonitorService , AdminServices {
     }
 
     @Override
-    public void deleteUserProfile(String MSSV) {
-
-    }
-
-    @Override
     public List<GetProfileRespond> getAllUsersProfile() {
         return List.of();
     }

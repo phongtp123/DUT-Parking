@@ -148,6 +148,7 @@ public class TicketImpl implements UserServices, AdminServices {
             var ticketType = userTicketsInfo.getTickets();
             var profile = userTicketsInfo.getUsersProfile();
             GetAllUserTicketsListRespond getAllUserTicketsListRespond = new GetAllUserTicketsListRespond();
+            getAllUserTicketsListRespond.setId(userTicketsInfo.getId());
             getAllUserTicketsListRespond.setTicketId(ticketType.getTicketId());
             getAllUserTicketsListRespond.setEmail(profile.getEmail());
             getAllUserTicketsListRespond.setMSSV(profile.getMSSV());
@@ -315,11 +316,6 @@ public class TicketImpl implements UserServices, AdminServices {
     @Override
     public RechargeRespond recharge(RechargeRequest request) {
         return null;
-    }
-
-    @Override
-    public void deleteUserProfile(String MSSV) {
-
     }
 
     @Override

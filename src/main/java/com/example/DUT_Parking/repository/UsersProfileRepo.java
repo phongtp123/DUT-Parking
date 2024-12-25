@@ -10,6 +10,5 @@ import java.util.List;
 public interface UsersProfileRepo extends JpaRepository<UsersProfile, String> {
     List<UsersProfile> findByMSSV(String MSSV);
     UsersProfile findByHovaten(String hovaten);
-    void deleteById(String MSSV);
     UsersProfile findByEmail(String email);
 }

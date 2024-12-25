@@ -60,12 +60,5 @@ public class UserProfileController {
         return adminServices.SearchUserProfile(MSSV);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/all_profiles/{MSSV}")
-    String DeleteUserProfile(@PathVariable String MSSV) {
-        adminServices.deleteUserProfile(MSSV);
-        return "User profile has been deleted";
-    }
-
 
 }

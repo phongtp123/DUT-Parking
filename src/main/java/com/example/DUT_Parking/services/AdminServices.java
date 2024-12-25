@@ -6,7 +6,6 @@ import com.example.DUT_Parking.respond.*;
 import java.util.List;
 
 public interface AdminServices {
-    void deleteUserProfile (String MSSV);
     List<GetProfileRespond> getAllUsersProfile();
     List<GetProfileRespond> SearchUserProfile (String MSSV);
     TicketRespond createTicket(TicketCreate request);

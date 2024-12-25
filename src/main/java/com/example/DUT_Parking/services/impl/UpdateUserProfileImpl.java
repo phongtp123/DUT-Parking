@@ -153,15 +153,6 @@ public class UpdateUserProfileImpl implements UserServices , AdminServices {
 
     }
 
-    @Transactional
-    public void deleteUserProfile (String MSSV) throws AppException {
-        try {
-            usersProfileRepo.deleteById(MSSV);
-        } catch (EmptyResultDataAccessException e) {
-            throw new AppException(ErrorCode.USER_NOT_EXISTED);
-        }
-    }
-
     public List<GetProfileRespond> getAllUsersProfile() {
         List<UsersProfile> getAllProfiles = usersProfileRepo.findAll();
         return getAllProfiles.stream().map(profile -> {

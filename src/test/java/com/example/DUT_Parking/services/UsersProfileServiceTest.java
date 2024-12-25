@@ -226,36 +226,6 @@ public class UsersProfileServiceTest {
         Assertions.assertEquals("User not existed" , exception.getMessage());
     }
 
-    // Test for function deleteUserProfile()
-    @Test
-    @DisplayName("Test delete user profile function - Delete success")
-    void testDeleteUserProfile_DeleteSuccess() {
-        String mssv = "MSSV";
-
-        UpdateUserProfileImpl spy = Mockito.spy(userProfileService);
-
-        Mockito.doNothing().when(usersProfileRepo).deleteById(mssv);
-
-        spy.deleteUserProfile(mssv);
-
-        Mockito.verify(usersProfileRepo).deleteById(mssv);
-    }
-
-    @Test
-    @DisplayName("Test delete user profile function - USER_NOT_EXISTED failed")
-    void testDeleteUserProfile_DeleteFailed() {
-        String mssv = "MSSV";
-
-        UpdateUserProfileImpl spy = Mockito.spy(userProfileService);
-
-        Mockito.doThrow(EmptyResultDataAccessException.class).when(usersProfileRepo).deleteById(mssv);
-
-        var exception = Assertions.assertThrows(AppException.class , () -> spy.deleteUserProfile(mssv));
-
-        Assertions.assertEquals(1005, exception.getErrorCode().getCode());
-        Assertions.assertEquals("User not existed" , exception.getMessage());
-    }
-
     // Test for function GetAllUsersProfile()
     @Test
     @DisplayName("Test get all user profiles function - Get success")
