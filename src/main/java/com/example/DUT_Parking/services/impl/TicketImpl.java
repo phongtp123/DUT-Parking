@@ -83,6 +83,9 @@ public class TicketImpl implements UserServices, AdminServices {
                 .usersProfile(userinfo)
                 .tickets(ticketType)
                 .status(status)
+                .hovaten(userinfo.getHovaten())
+                .ticketName(ticketName)
+                .menhgia(menhgia)
                 .build();
         userTicketsRepo.save(ticket);
         ticketType.getUserTicketsInfos().add(ticket);
@@ -296,25 +299,6 @@ public class TicketImpl implements UserServices, AdminServices {
         var data = ticket_token;
         ByteArrayOutputStream stream = QRCode.from(data).withSize(250 , 250).to(ImageType.PNG)
                 .stream();
-
-        try {
-            // Tạo thư mục nếu chưa tồn tại
-            File folder = new File("E:/Workspace/qr_code_image");
-            if (!folder.exists()) {
-                folder.mkdir();
-            }
-
-            // Tạo file và ghi dữ liệu từ stream
-            File file = new File(folder, String.valueOf(ImageType.PNG)); // Lưu với tên là token
-            try (FileOutputStream fos = new FileOutputStream(file)) {
-                fos.write(stream.toByteArray());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
-        }
-
         return stream.toByteArray();
     }
 

@@ -21,8 +21,13 @@ public class UserTicketsInfo {
     @ManyToOne
     UsersProfile usersProfile;
 
+    String hovaten;
+
     @ManyToOne
     Tickets tickets;
+
+    String ticketName;
+    int menhgia;
 
     Date issueDate;
     Date expiryDate;
