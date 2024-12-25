@@ -84,10 +84,10 @@ public class TicketImpl implements UserServices, AdminServices {
                 .tickets(ticketType)
                 .status(status)
                 .build();
+        userTicketsRepo.save(ticket);
         ticketType.getUserTicketsInfos().add(ticket);
         userinfo.getUserTicketsInfos().add(ticket);
         ticketsRepo.save(ticketType);
-        userTicketsRepo.save(ticket);
         usersProfileRepo.save(userinfo);
         return BuyTicketRespond.builder()
                 .status(true)
