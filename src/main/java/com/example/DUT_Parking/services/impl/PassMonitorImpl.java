@@ -56,9 +56,9 @@ public class PassMonitorImpl implements PassMonitorService , AdminServices {
         if (decision.equals("NOT PASS")){
             ticket.setStatus(TicketStatus.EXPIRED.name());
         }
+        passMonitorRepo.save(passMonitor);
         profile.getPassMonitors().add(passMonitor);
         ticket.getPassMonitors().add(passMonitor);
-        passMonitorRepo.save(passMonitor);
         userTicketsRepo.save(ticket);
         usersProfileRepo.save(profile);
     }
