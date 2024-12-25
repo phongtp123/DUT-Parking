@@ -222,6 +222,7 @@ public class TicketImpl implements UserServices, AdminServices {
 
         return tickets.stream().map(ticket -> {
             GetTicketTypeList getTicketTypeList = new GetTicketTypeList();
+            getTicketTypeList.setTicketId(ticket.getTicketId());
             getTicketTypeList.setTicketName(ticket.getTicketName());
             getTicketTypeList.setMenhgia(ticket.getMenhgia());
             return getTicketTypeList;
