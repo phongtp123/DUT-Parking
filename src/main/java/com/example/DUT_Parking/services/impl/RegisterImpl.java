@@ -55,9 +55,9 @@ public class RegisterImpl implements RegisterService {
             UsersProfile usersProfile = UsersProfile.builder()
                     .email(register_info.getEmail())
                     .password(register_info.getPassword())
+                    .registeredUsers(registerUser)
                     .roles(role)
                     .build();
-            registeredUserRepo.save(registerUser);
             usersProfileRepo.save(usersProfile);
         } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.EMAIL_EXISTED);

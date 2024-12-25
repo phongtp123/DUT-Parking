@@ -17,22 +17,25 @@ public class InitConfig {
     @Bean
     ApplicationRunner applicationRunner(RegisteredUserRepo registeredUserRepo, UsersProfileRepo usersProfileRepo) {
         return args -> {
-            if (usersProfileRepo.findByEmail("admin@gmail.com") == null) {
+            if (usersProfileRepo.findByEmail("admin@gmail.com") == null
+                    && registeredUserRepo.findByEmail("admin@gmail.com") == null) {
+
                 var role = new HashSet<String>();
                 role.add(Roles.ADMIN.name());
-                UsersProfile admin = UsersProfile.builder()
+
+                RegisteredUsers adminReg = RegisteredUsers.builder()
+                        .email("admin@gmail.com")
+                        .password("admin")
+                        .build();
+
+                UsersProfile adminProfile = UsersProfile.builder()
                         .email("admin@gmail.com")
                         .password("admin")
                         .roles(role)
+                        .registeredUsers(adminReg)
                         .build();
-                usersProfileRepo.save(admin);
-            }
-            if (registeredUserRepo.findByEmail("admin@gmail.com") == null ) {
-                RegisteredUsers admin_reg = RegisteredUsers.builder()
-                        .email("admin@gmail.com")
-                        .password("admin")
-                        .build();
-                registeredUserRepo.save(admin_reg);
+
+                usersProfileRepo.save(adminProfile);
             }
         };
     }

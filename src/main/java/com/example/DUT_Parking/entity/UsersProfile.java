@@ -2,6 +2,7 @@ package com.example.DUT_Parking.entity;
 
 
 import com.example.DUT_Parking.repository.TicketsRepo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -22,6 +23,11 @@ public class UsersProfile {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String MSSV;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @MapsId
+    @JsonIgnore
+    RegisteredUsers registeredUsers;
 
     @Column(nullable = false, unique = true)
     String email;

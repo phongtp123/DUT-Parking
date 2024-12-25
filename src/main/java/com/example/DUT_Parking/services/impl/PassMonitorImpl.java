@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,10 +49,12 @@ public class PassMonitorImpl implements PassMonitorService , AdminServices {
         var ticket = userTicketsRepo.findById(id);
         //var ticketType = ticket.getTickets();
         var profile = ticket.getUsersProfile();
+        var passTime = LocalDate.now();
         PassMonitor passMonitor = PassMonitor.builder()
                 .usersProfile(profile)
                 .userTicketsInfo(ticket)
                 .decision(decision)
+                .passTime(passTime)
                 .build();
         if (decision.equals("NOT PASS")){
             ticket.setStatus(TicketStatus.EXPIRED.name());
@@ -115,6 +118,7 @@ public class PassMonitorImpl implements PassMonitorService , AdminServices {
             getAllPassDataRespond.setEmail(profile.getEmail());
             getAllPassDataRespond.setTicketName(ticketType.getTicketName());
             getAllPassDataRespond.setDecision(passMonitor.getDecision());
+            getAllPassDataRespond.setPassTime(passMonitor.getPassTime());
             return getAllPassDataRespond;
         }).collect(Collectors.toList());
     }

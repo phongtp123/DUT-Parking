@@ -18,6 +18,8 @@ public class RegisteredUsers {
     @Column(nullable = false)
     String password;
     @OneToOne(mappedBy = "registeredUsers", cascade = CascadeType.ALL)
+    UsersProfile usersProfile;
+    @OneToOne(mappedBy = "registeredUsers", cascade = CascadeType.ALL)
     LoginUsers loginUsers;
     @OneToOne(mappedBy = "registeredUsers", cascade = CascadeType.ALL)
     LogoutUsers logoutUsers;
